@@ -1,0 +1,27 @@
+<header class="site-header">
+	<a class="brand header-link" href="/" aria-label="Home">
+		<span>Mathis Heck</span>
+	</a>
+
+	<button class="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav">
+		<span class="hamburger" aria-hidden="true"></span>
+	</button>
+
+	<nav id="primary-nav" class="site-nav" aria-label="Primary">
+		<a class="header-link" href="/images"><span>Images</span></a>
+		<a class="header-link" href="/contact"><span>Contact</span></a>
+		<a class="header-link" href="/impressum"><span>Impressum</span></a>
+	</nav>
+</header>
+
+<script type="text/javascript">
+	(function(){
+		const btn = document.querySelector('.nav-toggle');
+		const nav = document.getElementById('primary-nav');
+		if(!btn || !nav) return;
+		btn.addEventListener('click', function(){
+			const open = nav.classList.toggle('open');
+			btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+		});
+	})();
+</script>

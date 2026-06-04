@@ -1,0 +1,24 @@
+---
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+
+const { title = 'Mathis Heck', description = '' } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="shortcut icon" href="/favicon.svg" />
+		<title>{title}</title>
+		{description ? <meta name="description" content={description} /> : null}
+	</head>
+	<body>
+		<SiteHeader />
+		<main class="portfolio">
+			<slot />
+		</main>
+	</body>
+</html>

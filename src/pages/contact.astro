@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Contact | Mathis Heck" description="Contact Mathis Heck">
+	<style>
+		/* Keep the contact page as a fixed viewport layout */
+		html, body { overflow: hidden; height: 100%; }
+		.portfolio {
+			min-height: 90vh;
+			padding-top: 1.75rem;
+			padding-bottom: 0.75rem;
+			gap: 1.4rem;
+		}
+		.hero-split {
+			padding-top: 1.8rem;
+			padding-bottom: 0.9rem;
+		}
+		.contact-hero {
+			gap: clamp(1.5rem, 4vw, 3rem);
+		}
+	</style>
+	<section class="hero-split contact-hero" aria-label="Contact">
+		<div class="contact-copy">
+			<p class="eyebrow fade-item" style="--i:0">Contact</p>
+			<h1 class="intro-title fade-item" style="--i:1">where to find me</h1>
+			<p class="lead fade-item" style="--i:2">
+				For commissions, collaborations, or print inquiries, reach out via email or Instagram.
+			</p>
+		</div>
+		<div class="contact-links" aria-label="Contact links">
+			<a class="contact-link fade-item" style="--i:3" href="mailto:kontakt@mathisheck.de">
+				<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" role="img">
+					<path
+						d="M4.5 6.75A2.25 2.25 0 0 1 6.75 4.5h10.5a2.25 2.25 0 0 1 2.25 2.25v10.5a2.25 2.25 0 0 1-2.25 2.25H6.75a2.25 2.25 0 0 1-2.25-2.25V6.75Z"
+						stroke="currentColor"
+						stroke-width="1.5"
+					/>
+					<path
+						d="m6.75 7.5 5.25 4.5 5.25-4.5"
+						stroke="currentColor"
+						stroke-width="1.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+				<span class="typing" data-text="kontakt@mathisheck.de" aria-label="kontakt at mathisheck dot de"></span>
+			</a>
+			<a
+				class="contact-link fade-item"
+				style="--i:4"
+				href="https://www.instagram.com/mattyy.tr/"
+				target="_blank"
+				rel="noreferrer"
+			>
+				<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" role="img">
+					<rect
+						x="4.5"
+						y="4.5"
+						width="15"
+						height="15"
+						rx="4.5"
+						stroke="currentColor"
+						stroke-width="1.5"
+					/>
+					<circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.5" />
+					<circle cx="16.7" cy="7.3" r="0.9" fill="currentColor" />
+				</svg>
+				<span class="typing" data-text="instagram.com/mattyy.tr" aria-label="instagram dot com slash mattyy dot tr"></span>
+			</a>
+		</div>
+
+		<script type="module">
+			// Simple typewriter for contact links and fade-in staggering
+			document.addEventListener('DOMContentLoaded', () => {
+				const items = document.querySelectorAll('.fade-item');
+				items.forEach((el, i) => {
+					el.style.opacity = '';
+					el.style.animationDelay = `calc(var(--i, ${i}) * 120ms)`;
+				});
+
+					const typers = document.querySelectorAll('.typing');
+					typers.forEach((el, idx) => {
+						const text = el.getAttribute('data-text') || '';
+						el.textContent = '';
+						const total = 1000; // total duration in ms (~1s per request)
+						const delay = 220 + idx * 120; // start shortly after other fades
+						const step = Math.max(8, Math.round(total / Math.max(1, text.length)));
+						setTimeout(() => {
+							let i = 0;
+							const t = setInterval(() => {
+								i++;
+								el.textContent = text.slice(0, i);
+								if (i >= text.length) {
+									clearInterval(t);
+									el.classList.add('done');
+								}
+							}, step);
+						}, delay);
+					});
+			});
+		</script>
+	</section>
+</BaseLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Mathis Heck camera favicon">
+    <title>Mathis Heck — Camera (outline)</title>
+    <!-- fine-line camera outline, black strokes only -->
+    <rect x="8" y="26" width="112" height="76" rx="10" fill="none" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
+    <!-- top viewfinder -->
+    <rect x="28" y="18" width="22" height="12" rx="2" fill="none" stroke="#000" stroke-width="3"/>
+    <!-- lens outer ring -->
+    <circle cx="64" cy="64" r="20" fill="none" stroke="#000" stroke-width="3"/>
+    <!-- lens inner ring -->
+    <circle cx="64" cy="64" r="10" fill="none" stroke="#000" stroke-width="2"/>
+    <!-- small flash indicator -->
+    <circle cx="96" cy="40" r="3" fill="none" stroke="#000" stroke-width="2"/>
+</svg>

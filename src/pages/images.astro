@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import series from '../data/series.json';
+---
+
+<BaseLayout title="Images | Mathis Heck" description="Selected photography series by Mathis Heck">
+	<section class="images-page" aria-label="Selected work">
+		<header class="images-header fade-item" style="--i:0">
+			<p class="eyebrow">Images</p>
+			<h1 class="series-placeholder-title">Selected series.</h1>
+		</header>
+
+		<section class="work" aria-label="Series overview">
+			{series.map((s, i) => (
+				<article class={`work-item reveal-on-scroll ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug} style={`--i: ${i + 1}`}>
+					<div class="img-wrap">
+						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Open ${s.title} series`}>
+							<img
+								class={`series-cover ${s.slug === 'astro' ? 'series-cover--astro' : ''}`}
+								src={s.cover}
+								alt={`${s.title} cover`}
+								loading={i === 0 ? 'eager' : 'lazy'}
+							/>
+						</a>
+					</div>
+					<div class="series-meta">
+						<h2>{s.title}</h2>
+						<p>{s.description}</p>
+						<a href={`/images/${s.slug}`} class="series-link">View series →</a>
+					</div>
+				</article>
+			))}
+		</section>
+
+		<script is:inline>
+			const cards = document.querySelectorAll('.reveal-on-scroll');
+			if (cards.length) {
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach((entry) => {
+						entry.target.classList.toggle('is-visible', entry.isIntersecting);
+					});
+				}, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+				cards.forEach((card) => observer.observe(card));
+			}
+		</script>
+	</section>
+</BaseLayout>

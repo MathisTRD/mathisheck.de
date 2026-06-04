@@ -1,0 +1,37 @@
+[
+  {
+    "slug": "street",
+    "title": "Street",
+    "description": "Everyday scenes and fleeting encounters.",
+    "folder": "street",
+    "cover": "/cover/street.jpg"
+  },
+  {
+    "slug": "color",
+    "title": "Color",
+    "description": "A brighter set for color-driven scenes.",
+    "folder": "color",
+    "cover": "/cover/color.jpg"
+  },
+  {
+    "slug": "blackandwhite",
+    "title": "BlackAndWhite",
+    "description": "Monochrome frames, contrast, and quiet moments.",
+    "folder": "blackandwhite",
+    "cover": "/cover/blackandwhite.jpg"
+  },
+  {
+    "slug": "astro",
+    "title": "Astro",
+    "description": "Night skies, long exposures, and stillness.",
+    "folder": "astro",
+    "cover": "/cover/astro.jpg"
+  },
+  {
+    "slug": "concerts",
+    "title": "Concerts",
+    "description": "Live moments, stage light, and movement.",
+    "folder": "concert",
+    "cover": "/cover/concert.jpg"
+  }
+]

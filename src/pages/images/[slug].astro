@@ -1,0 +1,149 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import series from '../../data/series.json';
+import { Image } from 'astro:assets';
+
+type SeriesItem = (typeof series)[number];
+
+type LocalImage = {
+	src: ImageMetadata;
+	name: string;
+	folder: string;
+};
+
+type ImageMetadata = import('astro').ImageMetadata;
+
+const assetModules = import.meta.glob<ImageMetadata>('../../assets/**/*.{jpg,jpeg,png,webp,avif}', {
+	import: 'default',
+	eager: true,
+});
+
+const localImages = Object.entries(assetModules)
+	.map(([path, module]) => ({
+		src: module,
+		name: path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'image',
+		folder: path.split('/').at(-2) ?? '',
+	}))
+	.sort((left, right) => left.name.localeCompare(right.name));
+
+export function getStaticPaths() {
+	return series.map((item) => ({
+		params: { slug: item.slug },
+		props: { item },
+	}));
+}
+
+const { item } = Astro.props as { item: SeriesItem };
+const images = localImages.filter((image) => image.folder === item.folder);
+---
+
+<BaseLayout title={`${item.title} | Mathis Heck`} description={item.description}>
+	<section class="series-page" aria-label={item.title}>
+		<header class="series-page-header fade-item" style="--i:0">
+			<p class="eyebrow">Images</p>
+			<h1 class="series-placeholder-title">{item.title}</h1>
+		</header>
+
+		<section class="series-gallery series-gallery--local" aria-label={`${item.title} gallery`}>
+			{images.map((image, index) => (
+				<button
+					class="series-gallery-trigger fade-item"
+					type="button"
+					data-lightbox-trigger={index}
+					style={`--i:${index + 1};`}
+					aria-label={`Open ${item.title} image ${index + 1}`}
+				>
+					<Image
+						src={image.src}
+						alt={`${item.title} image ${index + 1}`}
+						widths={[360, 640, 960, 1280]}
+						sizes="(min-width: 900px) 33vw, 100vw"
+						loading={index === 0 ? 'eager' : 'lazy'}
+					/>
+				</button>
+			))}
+		</section>
+
+
+		<a class="series-link series-link--back fade-item" style={`--i:${Math.max(3, images.length + 2)}`} href="/images">Back to images</a>
+
+		{images.length > 0 ? (
+			<div class="lightbox" data-lightbox hidden aria-hidden="true">
+				<button class="lightbox-backdrop" type="button" data-lightbox-close aria-label="Close lightbox"></button>
+				<div class="lightbox-shell" role="presentation">
+					<button class="lightbox-zone lightbox-zone--prev" type="button" data-lightbox-prev aria-label="Previous image"></button>
+					<div class="lightbox-stage" aria-label={`${item.title} enlarged image`}>
+						{images.map((image, index) => (
+							<figure class="lightbox-item" data-lightbox-item={index} hidden={index !== 0}>
+								<Image
+									src={image.src}
+									alt={`${item.title} image ${index + 1}`}
+									widths={[640, 960, 1280, 1600, 2000]}
+									sizes="100vw"
+									loading={index === 0 ? 'eager' : 'lazy'}
+								/>
+							</figure>
+						))}
+					</div>
+					<button class="lightbox-zone lightbox-zone--next" type="button" data-lightbox-next aria-label="Next image"></button>
+				</div>
+			</div>
+		) : null}
+	</section>
+
+	<script is:inline>
+		const root = document.querySelector('[data-lightbox]');
+		const triggers = document.querySelectorAll('[data-lightbox-trigger]');
+		if (root && triggers.length) {
+			const items = root.querySelectorAll('[data-lightbox-item]');
+			const prevButton = root.querySelector('[data-lightbox-prev]');
+			const nextButton = root.querySelector('[data-lightbox-next]');
+			let currentIndex = 0;
+
+			const showItem = (index) => {
+				currentIndex = (index + items.length) % items.length;
+				items.forEach((item, itemIndex) => {
+					item.hidden = itemIndex !== currentIndex;
+				});
+			};
+
+			const openLightbox = (index) => {
+				showItem(index);
+				root.hidden = false;
+				root.setAttribute('aria-hidden', 'false');
+				document.body.classList.add('lightbox-open');
+				prevButton?.focus();
+			};
+
+			const closeLightbox = () => {
+				root.hidden = true;
+				root.setAttribute('aria-hidden', 'true');
+				document.body.classList.remove('lightbox-open');
+			};
+
+			triggers.forEach((trigger) => {
+				trigger.addEventListener('click', () => {
+					const index = Number(trigger.getAttribute('data-lightbox-trigger') || '0');
+					openLightbox(index);
+				});
+			});
+
+			prevButton?.addEventListener('click', () => showItem(currentIndex - 1));
+			nextButton?.addEventListener('click', () => showItem(currentIndex + 1));
+
+			root.addEventListener('click', (event) => {
+				const target = event.target;
+				if (!(target instanceof Element)) return;
+				if (target.closest('[data-lightbox-prev]') || target.closest('[data-lightbox-next]')) return;
+				closeLightbox();
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (root.hidden) return;
+				if (event.key === 'Escape') closeLightbox();
+				if (event.key === 'ArrowLeft') showItem(currentIndex - 1);
+				if (event.key === 'ArrowRight') showItem(currentIndex + 1);
+			});
+		}
+	</script>
+</BaseLayout>
