@@ -919,6 +919,30 @@ body {
 		box-shadow: none;
 	}
 
+	/* Stack card content vertically on small screens to avoid horizontal shifting */
+	.work-item {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		padding: 0.6rem 0.6rem 0.9rem 0.6rem; /* small padding for stacked layout */
+	}
+
+	.img-wrap {
+		flex: none;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		padding: 0.4rem 0;
+	}
+
+	.series-meta {
+		flex: none;
+		max-width: 100%;
+		padding: 0.6rem 0.6rem 0.6rem 0.6rem;
+		text-align: left;
+		align-items: flex-start;
+	}
+
 	.work-item h2 {
 		font-size: clamp(1.25rem, 5vw, 1.6rem);
 	}
@@ -931,9 +955,32 @@ body {
 	/* revert vertical placement on small screens */
 	.series-meta { justify-content: center; padding: 0 0.6rem; }
 
+	/* Remove large horizontal transforms on small screens to avoid overflow */
+	.work-item--reverse .series-meta,
+	.work-item:not(.work-item--reverse) .series-meta {
+		transform: none !important;
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+		text-align: left !important;
+		align-items: flex-start !important;
+	}
+
 	.series-link { padding: 0.45rem 0.7rem; font-size: 0.92rem; border-radius: 4px; }
 
 	.series-link { padding: 0.45rem 0.7rem; font-size: 0.92rem; }
+
+	/* Mobile: constrain main content to a centered column and prevent horizontal scroll */
+	.portfolio {
+		max-width: 680px;
+		margin-left: auto;
+		margin-right: auto;
+		padding-left: 0.75rem; /* ensure comfortable gutter */
+		padding-right: 0.75rem;
+		box-sizing: border-box;
+	}
+
+	/* As a safety, prevent horizontal overflow on narrow viewports */
+	html, body { overflow-x: hidden; }
 }
 
 .contact-hero {
