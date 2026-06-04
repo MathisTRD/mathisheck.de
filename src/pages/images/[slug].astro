@@ -15,16 +15,8 @@ type ImageMetadata = import('astro').ImageMetadata;
 
 const assetModules = import.meta.glob<ImageMetadata>('../../assets/**/*.{jpg,jpeg,png,webp,avif}', {
 	import: 'default',
-	eager: true,
+	eager: false,
 });
-
-const localImages = Object.entries(assetModules)
-	.map(([path, module]) => ({
-		src: module,
-		name: path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'image',
-		folder: path.split('/').at(-2) ?? '',
-	}))
-	.sort((left, right) => left.name.localeCompare(right.name));
 
 export function getStaticPaths() {
 	return series.map((item) => ({
@@ -34,6 +26,22 @@ export function getStaticPaths() {
 }
 
 const { item } = Astro.props as { item: SeriesItem };
+
+const localImages = await Promise.all(
+	Object.entries(assetModules)
+		.filter(([path]) => path.includes(`/${item.folder}/`))
+		.map(async ([path, resolver]) => {
+			const module = await resolver();
+			return {
+				src: module,
+				name: path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'image',
+				folder: path.split('/').at(-2) ?? '',
+			};
+		})
+);
+
+localImages.sort((left, right) => left.name.localeCompare(right.name));
+
 const images = localImages.filter((image) => image.folder === item.folder);
 ---
 
@@ -80,7 +88,7 @@ const images = localImages.filter((image) => image.folder === item.folder);
 									alt={`${item.title} image ${index + 1}`}
 									widths={[640, 960, 1280, 1600, 2000]}
 									sizes="100vw"
-									loading={index === 0 ? 'eager' : 'lazy'}
+									loading="eager"
 								/>
 							</figure>
 						))}
@@ -91,20 +99,78 @@ const images = localImages.filter((image) => image.folder === item.folder);
 		) : null}
 	</section>
 
+	<style is:inline>
+		.lightbox-stage {
+			position: relative;
+			width: fit-content;
+			height: fit-content;
+			max-width: 92vw;
+			max-height: 88vh;
+		}
+		.lightbox-item {
+			margin: 0;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			width: auto;
+			height: auto;
+			max-width: 92vw;
+			max-height: 88vh;
+			background: transparent;
+			box-shadow: none;
+			border-radius: 0;
+			overflow: visible;
+		}
+		.lightbox-item img { display: block; max-width: 92vw; max-height: 88vh; width: auto; height: auto; }
+		.lightbox-item.is-active { display: flex; pointer-events: auto; }
+		.lightbox-shell {
+			position: relative;
+			z-index: 1;
+			display: inline-flex;
+			width: fit-content;
+			height: fit-content;
+			align-items: center;
+			justify-content: center;
+			pointer-events: none;
+		}
+		.lightbox-zone {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+		.lightbox-zone--prev {
+			left: 0;
+			transform: translate(calc(-100% - 0.75rem), -50%);
+			margin-right: 0;
+		}
+		.lightbox-zone--next {
+			right: 0;
+			transform: translate(calc(100% + 0.75rem), -50%);
+			margin-left: 0;
+		}
+	</style>
+
 	<script is:inline>
 		const root = document.querySelector('[data-lightbox]');
 		const triggers = document.querySelectorAll('[data-lightbox-trigger]');
 		if (root && triggers.length) {
-			const items = root.querySelectorAll('[data-lightbox-item]');
+			const items = Array.from(root.querySelectorAll('[data-lightbox-item]'));
 			const prevButton = root.querySelector('[data-lightbox-prev]');
 			const nextButton = root.querySelector('[data-lightbox-next]');
 			let currentIndex = 0;
 
-			const showItem = (index) => {
-				currentIndex = (index + items.length) % items.length;
+			const activateItem = (index) => {
+				const nextIndex = (index + items.length) % items.length;
 				items.forEach((item, itemIndex) => {
-					item.hidden = itemIndex !== currentIndex;
+					const isActive = itemIndex === nextIndex;
+					item.hidden = !isActive;
+					item.classList.toggle('is-active', isActive);
 				});
+				currentIndex = nextIndex;
+			};
+
+			const showItem = (index) => {
+				activateItem(index);
 			};
 
 			const openLightbox = (index) => {
@@ -144,6 +210,16 @@ const images = localImages.filter((image) => image.folder === item.folder);
 				if (event.key === 'ArrowLeft') showItem(currentIndex - 1);
 				if (event.key === 'ArrowRight') showItem(currentIndex + 1);
 			});
+
+			// basic touch swipe handling
+			let touchStartX = 0;
+			root.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+			root.addEventListener('touchend', (e) => {
+				const dx = e.changedTouches[0].clientX - touchStartX;
+				if (Math.abs(dx) > 40) {
+					if (dx > 0) showItem(currentIndex - 1); else showItem(currentIndex + 1);
+				}
+			}, { passive: true });
 		}
 	</script>
 </BaseLayout>

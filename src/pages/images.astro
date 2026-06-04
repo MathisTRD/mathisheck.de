@@ -1,25 +1,40 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import series from '../data/series.json';
+type CoverImage = import('astro').ImageMetadata;
+
+const coverModules = import.meta.glob<CoverImage>('../assets/cover/*.{jpg,jpeg,png,webp,avif}', {
+	import: 'default',
+	eager: true,
+});
+
+const coverByName = Object.fromEntries(
+	Object.entries(coverModules).map(([path, image]) => [path.split('/').pop() ?? path, image])
+);
+
+const getCoverSrc = (cover: string) => coverByName[cover.split('/').pop() ?? cover]?.src ?? cover;
+
 ---
 
 <BaseLayout title="Images | Mathis Heck" description="Selected photography series by Mathis Heck">
 	<section class="images-page" aria-label="Selected work">
-		<header class="images-header fade-item" style="--i:0">
+		<header class="images-header">
 			<p class="eyebrow">Images</p>
 			<h1 class="series-placeholder-title">Selected series.</h1>
 		</header>
 
 		<section class="work" aria-label="Series overview">
 			{series.map((s, i) => (
-				<article class={`work-item reveal-on-scroll ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug} style={`--i: ${i + 1}`}>
+				<article class={`work-item ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug}>
 					<div class="img-wrap">
 						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Open ${s.title} series`}>
 							<img
 								class={`series-cover ${s.slug === 'astro' ? 'series-cover--astro' : ''}`}
-								src={s.cover}
+									src={getCoverSrc(s.cover)}
 								alt={`${s.title} cover`}
 								loading={i === 0 ? 'eager' : 'lazy'}
+								decoding="auto"
+								fetchpriority={i === 0 ? 'high' : 'low'}
 							/>
 						</a>
 					</div>
@@ -31,18 +46,19 @@ import series from '../data/series.json';
 				</article>
 			))}
 		</section>
-
-		<script is:inline>
-			const cards = document.querySelectorAll('.reveal-on-scroll');
-			if (cards.length) {
-				const observer = new IntersectionObserver((entries) => {
-					entries.forEach((entry) => {
-						entry.target.classList.toggle('is-visible', entry.isIntersecting);
-					});
-				}, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
-
-				cards.forEach((card) => observer.observe(card));
-			}
-		</script>
 	</section>
+
+		<style is:inline>
+			.images-page .fade-item,
+			.images-page .reveal-on-scroll,
+			.images-page .work-item,
+			.images-page .series-cover,
+			.images-page .series-meta {
+				opacity: 1 !important;
+				transform: none !important;
+				filter: none !important;
+				animation: none !important;
+				transition: none !important;
+			}
+		</style>
 </BaseLayout>
