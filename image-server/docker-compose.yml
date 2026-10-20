@@ -1,6 +1,6 @@
 # Image server for mathisheck.de, deployed as a Dokploy "Compose" service.
 #   images  – serves the photos publicly (domain e.g. images.mathisheck.de, port 80)
-#   upload  – File Browser UI to upload/manage photos (domain e.g. upload.mathisheck.de, port 80)
+#   upload  – FileBrowser Quantum UI to upload/manage photos (domain e.g. upload.mathisheck.de, port 80)
 #   indexer – publishes /_index.json + /_version and redeploys the website after changes
 services:
   images:
@@ -15,14 +15,16 @@ services:
       - dokploy-network
 
   upload:
-    image: filebrowser/filebrowser:v2.63.23
+    build: ./filebrowser
     restart: unless-stopped
     # root so it can always write to the shared volume, whichever container created it
     user: "0:0"
+    environment:
+      # Login: user "admin" with this password (re-applied on every start)
+      FILEBROWSER_ADMIN_PASSWORD: ${FILEBROWSER_ADMIN_PASSWORD:?set FILEBROWSER_ADMIN_PASSWORD in the Dokploy environment}
     volumes:
       - photos:/srv
-      - filebrowser-database:/database
-      - filebrowser-config:/config
+      - filebrowser-data:/home/filebrowser/data
     networks:
       - default
       - dokploy-network
@@ -44,8 +46,7 @@ services:
 
 volumes:
   photos:
-  filebrowser-database:
-  filebrowser-config:
+  filebrowser-data:
 
 networks:
   dokploy-network:

@@ -1,0 +1,18 @@
+server:
+  sources:
+    - path: /srv
+      name: photos
+      config:
+        private: true # no public share links
+        defaultEnabled: true
+  filesystem:
+    # world-readable, so nginx and the indexer can serve/scan new uploads
+    createFilePermission: "644"
+    createDirectoryPermission: "755"
+auth:
+  methods:
+    password:
+      enabled: true
+      signup: false
+      minLength: 10
+      # admin password comes from FILEBROWSER_ADMIN_PASSWORD (set in Dokploy)
