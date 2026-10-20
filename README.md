@@ -1,49 +1,49 @@
 # mathisheck.de
 
-Photography portfolio built with Astro and Tailwind CSS.
+Fotografie-Portfolio von Mathis Heck. Statische Website mit Astro, die Fotos liegen nicht im Repository, sondern auf einem eigenen Bildserver, der zusammen mit der Website über Dokploy betrieben wird.
 
-## Commands
+## Technik
 
-| Command                    | Action                                                  |
-| :------------------------- | :------------------------------------------------------ |
-| `npm install`              | Install dependencies                                    |
-| `npm run dev`              | Start dev server at `localhost:4321`                    |
-| `npm run build`            | Build the static site to `./dist/`                      |
-| `npm run preview`          | Preview the build locally                               |
-| `npm run images:manifest`  | Rebuild the image lists in `src/data/series.json`       |
+- **Website:** Astro 6, Tailwind CSS 4, ausgeliefert als statische Seiten über nginx (`DOCKERFILE`)
+- **Bildserver** (`image-server/`):
+  - `images`: nginx, liefert die Fotos aus (z. B. `images.mathisheck.de`)
+  - `upload`: FileBrowser Quantum, Weboberfläche zum Hochladen (z. B. `upload.mathisheck.de`)
+  - `indexer`: Node-Dienst, erzeugt die Bildliste `/_index.json` und löst nach Änderungen einen Rebuild der Website in Dokploy aus
+- **Hosting:** Dokploy (Website als Application, Bildserver als Compose-Service)
 
-## Images
+Fotos werden beim Build von Astro heruntergeladen und in optimierte WebP-Varianten umgewandelt. Besucher laden nur diese verkleinerten Dateien von der Website.
 
-Series and their images are listed in `src/data/series.json`:
+## Schnellstart
 
-- `cover`: path of the cover image, e.g. `cover/street.jpg`
-- `folder`: folder of the series, e.g. `street`
-- `images`: file names inside that folder
+Voraussetzung: Node.js 22.12 oder neuer.
 
-Image paths are resolved in `src/lib/images.ts`:
+```sh
+npm ci
+```
 
-- `PUBLIC_IMAGE_BASE_URL` set → images are loaded from `<base>/<path>`,
-  e.g. `https://res.cloudinary.com/<cloud>/image/upload/mathisheck/street/foo.jpg`.
-- not set → images are loaded from `src/assets/<path>`.
+**Mit Bildserver** (empfohlen):
 
-In both cases Astro downloads/reads the originals at build time and ships optimized
-WebP variants in `dist/`, so the external host only has to serve the originals to the build.
+```sh
+cp .env.example .env    # PUBLIC_IMAGE_BASE_URL=https://images.mathisheck.de
+npm run dev             # http://localhost:4321
+```
 
-### Hosting images externally
+**Mit lokalen Bildern** (ohne `.env`): Fotos nach `src/assets/<ordner>/` legen, z. B. `src/assets/street/foto.jpg` und `src/assets/cover/street.jpg`. Der Ordner ist in `.gitignore` und wird nicht committet.
 
-1. Upload the images to any public host (Cloudinary, Cloudflare R2, Bunny, S3, …),
-   keeping the structure `cover/…`, `street/…`, `color/…`, `blackandwhite/…`, `astro/…`, `concert/…`.
-2. Set the base URL (see `.env.example`):
-   - locally: `.env` with `PUBLIC_IMAGE_BASE_URL=…`
-   - Docker: `docker build --build-arg PUBLIC_IMAGE_BASE_URL=… -f DOCKERFILE .`
-3. Add new images: put them on the host, then add the file names to `images` in
-   `src/data/series.json` (or keep a local mirror folder and run
-   `npm run images:manifest -- <folder>`).
-4. Remove the images from the repository:
-   ```sh
-   git rm -r --cached src/assets
-   echo "src/assets/" >> .gitignore
-   ```
-   They stay in the git history. To shrink the repository as well, rewrite history with
-   [`git filter-repo`](https://github.com/newren/git-filter-repo) (`git filter-repo --path src/assets --invert-paths`)
-   and force-push.
+```sh
+npm run dev
+```
+
+| Befehl            | Wirkung                                        |
+| :---------------- | :--------------------------------------------- |
+| `npm run dev`     | Entwicklungsserver auf `localhost:4321`        |
+| `npm run build`   | Statische Seite nach `./dist/` bauen           |
+| `npm run preview` | Gebaute Seite lokal ansehen                    |
+
+## Dokumentation
+
+- [Architektur](docs/architektur.md): Komponenten, Datenfluss, Aufbau des Repositorys
+- [Deployment mit Dokploy](docs/deployment-dokploy.md): Einrichtung von Bildserver und Website
+- [Bilder verwalten](docs/bilder-verwalten.md): Fotos hochladen, löschen, neue Serien anlegen
+- [Entwicklung](docs/entwicklung.md): lokale Entwicklung, Bildserver lokal starten, Styling
+- [Fehlerbehebung](docs/fehlerbehebung.md): häufige Probleme und Lösungen
