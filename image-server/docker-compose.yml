@@ -1,0 +1,52 @@
+# Image server for mathisheck.de, deployed as a Dokploy "Compose" service.
+#   images  – serves the photos publicly (domain e.g. images.mathisheck.de, port 80)
+#   upload  – File Browser UI to upload/manage photos (domain e.g. upload.mathisheck.de, port 80)
+#   indexer – publishes /_index.json + /_version and redeploys the website after changes
+services:
+  images:
+    build: ./nginx
+    restart: unless-stopped
+    depends_on:
+      - indexer
+    volumes:
+      - photos:/srv/photos:ro
+    networks:
+      - default
+      - dokploy-network
+
+  upload:
+    image: filebrowser/filebrowser:v2.63.23
+    restart: unless-stopped
+    # root so it can always write to the shared volume, whichever container created it
+    user: "0:0"
+    volumes:
+      - photos:/srv
+      - filebrowser-database:/database
+      - filebrowser-config:/config
+    networks:
+      - default
+      - dokploy-network
+
+  indexer:
+    build: ./indexer
+    restart: unless-stopped
+    environment:
+      # Optional: redeploy the website automatically after uploads
+      DOKPLOY_URL: ${DOKPLOY_URL:-}
+      DOKPLOY_API_KEY: ${DOKPLOY_API_KEY:-}
+      DOKPLOY_APPLICATION_ID: ${DOKPLOY_APPLICATION_ID:-}
+      # Seconds without further changes before the redeploy is triggered
+      QUIET_SECONDS: ${QUIET_SECONDS:-120}
+    volumes:
+      - photos:/srv/photos:ro
+    networks:
+      - default
+
+volumes:
+  photos:
+  filebrowser-database:
+  filebrowser-config:
+
+networks:
+  dokploy-network:
+    external: true
