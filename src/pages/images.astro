@@ -1,19 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import series from '../data/series.json';
-type CoverImage = import('astro').ImageMetadata;
+import { Image } from 'astro:assets';
+import { isRemote, resolveImage } from '../lib/images';
 
-const coverModules = import.meta.glob<CoverImage>('../assets/cover/*.{jpg,jpeg,png,webp,avif}', {
-	import: 'default',
-	eager: true,
-});
-
-const coverByName = Object.fromEntries(
-	Object.entries(coverModules).map(([path, image]) => [path.split('/').pop() ?? path, image])
-);
-
-const getCoverSrc = (cover: string) => coverByName[cover.split('/').pop() ?? cover]?.src ?? cover;
-
+const covers = await Promise.all(series.map((item) => resolveImage(item.cover)));
 ---
 
 <BaseLayout title="Images | Mathis Heck" description="Selected photography series by Mathis Heck">
@@ -28,12 +19,14 @@ const getCoverSrc = (cover: string) => coverByName[cover.split('/').pop() ?? cov
 				<article class={`work-item ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug}>
 					<div class="img-wrap">
 						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Open ${s.title} series`}>
-							<img
+							<Image
 								class={`series-cover ${s.slug === 'astro' ? 'series-cover--astro' : ''}`}
-									src={getCoverSrc(s.cover)}
+								src={covers[i]}
+								inferSize={isRemote(covers[i])}
 								alt={`${s.title} cover`}
+								widths={[480, 800, 1200]}
+								sizes="(min-width: 701px) 46vw, 100vw"
 								loading={i === 0 ? 'eager' : 'lazy'}
-								decoding="auto"
 								fetchpriority={i === 0 ? 'high' : 'low'}
 							/>
 						</a>

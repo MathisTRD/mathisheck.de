@@ -3,6 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+# Base URL of the external image host (see README). Pass with --build-arg.
+ARG PUBLIC_IMAGE_BASE_URL
+ENV PUBLIC_IMAGE_BASE_URL=$PUBLIC_IMAGE_BASE_URL
 RUN npm run build
 
 FROM nginx:alpine AS runtime

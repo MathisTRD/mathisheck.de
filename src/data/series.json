@@ -4,34 +4,96 @@
     "title": "Street",
     "description": "Everyday scenes and fleeting encounters.",
     "folder": "street",
-    "cover": "street.jpg"
+    "cover": "cover/street.jpg",
+    "images": [
+      "mathisheck-11_oqepsf.jpg",
+      "mathisheck-12_lrnfqd.jpg",
+      "mathisheck-3603-2_s5ibcw.jpg",
+      "mathisheck-4061_hpgo6a.jpg",
+      "mathisheck-4105_gazcuv.jpg",
+      "mathisheck-4414_dbrkmx.jpg",
+      "mathisheck-4423_t76fyp.jpg",
+      "mathisheck-52_h1oy2f.jpg",
+      "mathisheck-7_bb8rlk.jpg",
+      "mathisheck-79_wq24e0.jpg",
+      "mathisheck-83_fwmasz.jpg",
+      "mathisheck-86_hd3zqj.jpg",
+      "mathisheck-88_xicceb.jpg",
+      "mathisheck-9_db1kqe.jpg"
+    ]
   },
   {
     "slug": "color",
     "title": "Color",
     "description": "A brighter set for color-driven scenes.",
     "folder": "color",
-    "cover": "color.jpg"
+    "cover": "cover/color.jpg",
+    "images": [
+      "mathisheck-114_vajpg8.jpg",
+      "mathisheck-18_wa88ix.jpg",
+      "mathisheck-3542_oonwvv.jpg",
+      "mathisheck-3601_y4eht8.jpg",
+      "mathisheck-3617_xfl9ng.jpg",
+      "mathisheck-37_iypt4b.jpg",
+      "mathisheck-3749_zraga7.jpg",
+      "mathisheck-4080_lva0nj.jpg",
+      "mathisheck-75_vfd2tf.jpg",
+      "untitled-1050621.jpg",
+      "untitled-4573_jyhlzt.jpg",
+      "untitled-4601_gofieo.jpg",
+      "untitled-4624_nayi7v.jpg",
+      "untitled-4667_giaqng.jpg",
+      "untitled-4668_flrqvb.jpg",
+      "untitled-4791_eronkx.jpg",
+      "untitled-4835_jkilkb.jpg",
+      "untitled-5309.jpg",
+      "untitled-5687.jpg"
+    ]
   },
   {
     "slug": "blackandwhite",
     "title": "BlackAndWhite",
     "description": "Monochrome frames, contrast, and quiet moments.",
     "folder": "blackandwhite",
-    "cover": "blackandwhite.jpg"
+    "cover": "cover/blackandwhite.jpg",
+    "images": [
+      "mathisheck-13_eatiij.jpg",
+      "mathisheck-14_j5ccox.jpg",
+      "mathisheck-5_mjd39o.jpg",
+      "untitled-5906.jpg",
+      "untitled-5915.jpg",
+      "untitled-5975.jpg"
+    ]
   },
   {
     "slug": "astro",
     "title": "Astro",
     "description": "Night skies, long exposures, and stillness.",
     "folder": "astro",
-    "cover": "astro.jpg"
+    "cover": "cover/astro.jpg",
+    "images": [
+      "mathisheck-0174_gzsmax.jpg",
+      "mathisheck-0830_eyr2sz.jpg",
+      "mathisheck-0937_cl7cxs.jpg",
+      "mathisheck-1312_x1o0oh.jpg",
+      "mathisheck-2184_fad88h.jpg",
+      "mathisheck-3134_a2nbfg.jpg",
+      "mathisheck-3322_ofic3v.jpg",
+      "mathisheck-6638_hhtil7.jpg"
+    ]
   },
   {
     "slug": "concerts",
     "title": "Concerts",
     "description": "Live moments, stage light, and movement.",
     "folder": "concert",
-    "cover": "concert.jpg"
+    "cover": "cover/concert.jpg",
+    "images": [
+      "mathisheck-21_gtnt2y.jpg",
+      "mathisheck-22_xcdhpo.jpg",
+      "mathisheck-28_r5zhgg.jpg",
+      "mathisheck-29_yomrd9.jpg",
+      "mathisheck-50_qlopgn.jpg"
+    ]
   }
 ]
