@@ -3,9 +3,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-# Base URL of the external image host (see README). Pass with --build-arg.
-ARG PUBLIC_IMAGE_BASE_URL
+# Base URL of the image server (image-server/). Override with --build-arg.
+ARG PUBLIC_IMAGE_BASE_URL=https://images.mathisheck.de
 ENV PUBLIC_IMAGE_BASE_URL=$PUBLIC_IMAGE_BASE_URL
+# Invalidates the Docker build cache whenever photos on the image server change
+ADD ${PUBLIC_IMAGE_BASE_URL}/_version /tmp/images-version
 RUN npm run build
 
 FROM nginx:alpine AS runtime

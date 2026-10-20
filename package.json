@@ -9,8 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "images:manifest": "node scripts/sync-image-manifest.mjs"
+    "astro": "astro"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",

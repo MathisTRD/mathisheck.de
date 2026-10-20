@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import series from '../../data/series.json';
 import { Image } from 'astro:assets';
-import { isRemote, resolveImage } from '../../lib/images';
+import { isRemote, listFolder, resolveImage } from '../../lib/images';
 
 type SeriesItem = (typeof series)[number];
 
@@ -15,7 +15,8 @@ export function getStaticPaths() {
 
 const { item } = Astro.props as { item: SeriesItem };
 
-const images = await Promise.all(item.images.map((file) => resolveImage(`${item.folder}/${file}`)));
+const files = await listFolder(item.folder);
+const images = await Promise.all(files.map((file) => resolveImage(`${item.folder}/${file}`)));
 ---
 
 <BaseLayout title={`${item.title} | Mathis Heck`} description={item.description}>

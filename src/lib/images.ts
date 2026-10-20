@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 
-// Base URL of the external image host, e.g. https://res.cloudinary.com/<cloud>/image/upload/mathisheck
+// Base URL of the image server (see image-server/), e.g. https://images.mathisheck.de
 // When unset, images are loaded from src/assets (local development / fallback).
 const baseUrl = import.meta.env.PUBLIC_IMAGE_BASE_URL?.replace(/\/+$/, '');
 
@@ -9,6 +9,32 @@ const localImages = import.meta.glob<ImageMetadata>('../assets/**/*.{jpg,jpeg,pn
 });
 
 export type ResolvedImage = ImageMetadata | string;
+
+type RemoteIndex = { version: string; folders: Record<string, string[]> };
+
+let remoteIndex: Promise<RemoteIndex> | undefined;
+
+const loadRemoteIndex = () =>
+	(remoteIndex ??= fetch(`${baseUrl}/_index.json`).then(async (response) => {
+		if (!response.ok) {
+			throw new Error(`Could not load ${baseUrl}/_index.json: HTTP ${response.status}`);
+		}
+		return (await response.json()) as RemoteIndex;
+	}));
+
+/** Lists the image file names of a series folder, sorted by name. */
+export async function listFolder(folder: string): Promise<string[]> {
+	if (baseUrl) {
+		const { folders } = await loadRemoteIndex();
+		return folders[folder] ?? [];
+	}
+
+	const prefix = `../assets/${folder}/`;
+	return Object.keys(localImages)
+		.filter((key) => key.startsWith(prefix) && !key.slice(prefix.length).includes('/'))
+		.map((key) => key.slice(prefix.length))
+		.sort((left, right) => left.localeCompare(right));
+}
 
 /** Resolves a path like "street/foo.jpg" (or an absolute URL) to something <Image> accepts. */
 export async function resolveImage(imagePath: string): Promise<ResolvedImage> {
