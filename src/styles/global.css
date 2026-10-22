@@ -452,6 +452,30 @@ body {
 	text-underline-offset: 0.18em;
 }
 
+/* ---------- Datenschutz (long text, one column) ---------- */
+
+.legal {
+	display: grid;
+	gap: var(--section-gap);
+	align-content: start;
+	width: 100%;
+	min-width: 0;
+	max-width: 46rem;
+}
+
+.legal .info-block {
+	justify-items: start;
+	text-align: left;
+}
+
+.legal .info-block h2 {
+	margin: 0;
+}
+
+.legal code {
+	font-family: inherit;
+}
+
 /* ---------- Entrance animation ---------- */
 
 @keyframes fadeUp {
