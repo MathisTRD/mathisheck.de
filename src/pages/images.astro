@@ -93,7 +93,7 @@ const altOf = (photo: (typeof photos)[number]) =>
 			<div class="lightbox" data-lightbox hidden aria-hidden="true">
 				<button class="lightbox-backdrop" type="button" data-lightbox-close aria-label="Vergrößerung schließen"></button>
 				<div class="lightbox-shell" role="presentation">
-					<button class="lightbox-zone lightbox-zone--prev" type="button" data-lightbox-prev aria-label="Vorheriges Bild"></button>
+					<button class="lightbox-zone lightbox-zone--prev" type="button" data-lightbox-prev aria-label="Vorheriges Bild"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
 					<div class="lightbox-stage" aria-label="Vergrößertes Bild">
 						{photos.map((photo, index) => (
 							<figure class="lightbox-item" data-lightbox-item={index} hidden>
@@ -101,7 +101,7 @@ const altOf = (photo: (typeof photos)[number]) =>
 							</figure>
 						))}
 					</div>
-					<button class="lightbox-zone lightbox-zone--next" type="button" data-lightbox-next aria-label="Nächstes Bild"></button>
+					<button class="lightbox-zone lightbox-zone--next" type="button" data-lightbox-next aria-label="Nächstes Bild"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
 				</div>
 			</div>
 		) : null}
@@ -145,6 +145,7 @@ const altOf = (photo: (typeof photos)[number]) =>
 		}
 		.lightbox-zone {
 			position: absolute;
+			z-index: 1;
 			top: 50%;
 			width: var(--lb-arrow);
 			height: var(--lb-arrow);
@@ -153,11 +154,29 @@ const altOf = (photo: (typeof photos)[number]) =>
 		}
 		.lightbox-zone--prev { left: 0; }
 		.lightbox-zone--next { right: 0; }
-		.lightbox-zone--prev::after,
-		.lightbox-zone--next::after { left: 50%; right: auto; transform: translate(-50%, -50%); }
+		/* Frosted disc keeps the chevron readable on light and dark photos alike */
+		.lightbox-zone {
+			display: grid;
+			place-items: center;
+			color: rgba(255, 255, 255, 0.92);
+			background: rgba(18, 18, 18, 0.32);
+			border: 1px solid rgba(255, 255, 255, 0.14);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			transition: background-color 0.2s ease, border-color 0.2s ease;
+		}
+		.lightbox-zone::after { content: none; }
+		.lightbox-zone svg { width: 1.4rem; height: 1.4rem; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s ease; }
+		.lightbox-zone:hover,
+		.lightbox-zone:focus-visible { background: rgba(18, 18, 18, 0.55); border-color: rgba(255, 255, 255, 0.32); }
+		.lightbox-zone:focus-visible { outline: 2px solid rgba(255, 255, 255, 0.7); outline-offset: 3px; }
+		.lightbox-zone--prev:hover svg { transform: translateX(-2px); }
+		.lightbox-zone--next:hover svg { transform: translateX(2px); }
 		/* Phones: arrows overlay the photo edges instead of taking width from it */
 		@media (max-width: 900px) {
 			.lightbox { --lb-arrow: 2.75rem; --lb-reserve: 0px; }
+			.lightbox-zone--prev { left: 0.5rem; }
+			.lightbox-zone--next { right: 0.5rem; }
 		}
 	</style>
 
