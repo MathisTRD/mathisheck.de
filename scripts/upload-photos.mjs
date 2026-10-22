@@ -31,12 +31,17 @@ const env = (name) => {
 };
 
 const bucket = env('R2_BUCKET');
+const accountId = env('R2_ACCOUNT_ID')?.trim();
+if (accountId && !/^[0-9a-f]{32}$/i.test(accountId)) {
+	throw new Error('R2_ACCOUNT_ID must be the 32-character account ID only, not a URL');
+}
 const baseUrl = (env('R2_PUBLIC_URL') ?? 'https://images.mathisheck.de').replace(/\/+$/, '');
 const s3 = dryRun
 	? null
 	: new S3Client({
 			region: 'auto',
-			endpoint: `https://${env('R2_ACCOUNT_ID')}.r2.cloudflarestorage.com`,
+			forcePathStyle: true,
+			endpoint: `https://${accountId}.${process.env.R2_JURISDICTION ? process.env.R2_JURISDICTION + '.' : ''}r2.cloudflarestorage.com`,
 			credentials: {
 				accessKeyId: env('R2_ACCESS_KEY_ID'),
 				secretAccessKey: env('R2_SECRET_ACCESS_KEY'),
