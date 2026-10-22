@@ -29,7 +29,7 @@ const altOf = (photo: (typeof photos)[number]) =>
 	[subjectOf(photo), ...tagsOf(photo)].filter(Boolean).map((slug) => titles[slug!]).join(', ') || 'Foto';
 ---
 
-<BaseLayout title="Bilder | Mathis Heck" description="Fotografie von Mathis Heck: Street, Konzerte und Astro">
+<BaseLayout title="Bilder | Mathis Heck" description="Fotografie von Mathis Heck: Alltag, Konzerte und Astro">
 	<section class="images-page" aria-label="Bilder">
 		<header class="page-intro fade-item" style="--i:0">
 			<p class="eyebrow">Bilder</p>

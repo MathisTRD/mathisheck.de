@@ -1,6 +1,6 @@
 {
   "subjects": [
-    { "slug": "street", "title": "Street" },
+    { "slug": "street", "title": "Alltag" },
     { "slug": "concert", "title": "Konzerte" },
     { "slug": "astro", "title": "Astro" }
   ],
