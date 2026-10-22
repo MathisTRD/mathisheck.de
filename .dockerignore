@@ -1,0 +1,12 @@
+# Keep the Docker build context small: no git history, local photos or build output.
+.git
+.github
+.vscode
+.astro
+node_modules
+dist
+photos
+.env
+.env.*
+!.env.example
+*.md
