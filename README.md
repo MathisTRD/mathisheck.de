@@ -8,7 +8,7 @@ and rendered on the server with the Node adapter.
 - **Photos** are stored in Cloudflare R2, not in this repository. Each photo is converted
   to AVIF and WebP in several widths and served with responsive `srcset`. A
   `manifest.json` in the bucket lists all photos, so new uploads appear without a redeploy.
-- **Subjects and tags**: every photo has one subject (Street, Konzerte, Astro) and any number of
+- **Subjects and tags**: every photo has one subject (Alltag, Konzerte, Astro) and any number of
   tags (Schwarzweiß, Farbe), defined in `src/data/taxonomy.json`. `/images` shows one gallery
   with filters (`?motiv=street&tag=bw`). Photos from the old series folders get defaults from
   their folder until they are edited.
