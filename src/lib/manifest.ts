@@ -31,20 +31,23 @@ const env = { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, 
 export const store = hasR2Config(env) ? createStore(env) : null;
 
 const TTL = 5 * 60 * 1000;
-let cached: { manifest: Manifest; at: number } | null = null;
+// After a failed R2 read, retry after a minute instead of making every request wait for the timeout.
+const RETRY_AFTER_ERROR = 60 * 1000;
+let cached: { manifest: Manifest; at: number; ttl: number } | null = null;
 
 export async function getManifest(): Promise<Manifest> {
-	if (cached && Date.now() - cached.at < TTL) return cached.manifest;
-	let manifest = bundled as Manifest;
+	if (cached && Date.now() - cached.at < cached.ttl) return cached.manifest;
+	let manifest = (cached?.manifest ?? bundled) as Manifest;
+	let ttl = TTL;
 	if (store) {
 		try {
-			manifest = ((await store.getManifest()) as Manifest | null) ?? manifest;
+			manifest = ((await store.getManifest()) as Manifest | null) ?? (bundled as Manifest);
 		} catch (error) {
-			console.error('Could not load manifest from R2, using bundled copy', error);
-			if (cached) return cached.manifest;
+			console.error('Could not load manifest from R2, using last known copy', error);
+			ttl = RETRY_AFTER_ERROR;
 		}
 	}
-	cached = { manifest, at: Date.now() };
+	cached = { manifest, at: Date.now(), ttl };
 	return manifest;
 }
 
@@ -67,7 +70,7 @@ export function updateManifest(change: (manifest: Manifest) => Manifest | Promis
 		cached = null;
 		const next = await change(await getManifest());
 		await store.saveManifest(next);
-		cached = { manifest: { ...next, baseUrl: store.baseUrl }, at: Date.now() };
+		cached = { manifest: { ...next, baseUrl: store.baseUrl }, at: Date.now(), ttl: TTL };
 		return cached.manifest;
 	});
 	queue = run.catch(() => {});
