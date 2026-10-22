@@ -1,6 +1,7 @@
 // Shared R2 photo storage, used by the admin API and scripts/upload-photos.mjs.
-// Each photo is stored as <folder>/<name>/<width>.<avif|webp>, the untouched
-// original as originals/<folder>/<file>, and the list of all photos as manifest.json.
+// Each photo is stored in the public bucket as <folder>/<name>/<width>.<avif|webp>,
+// the list of all photos as manifest.json, and the untouched original in the
+// private R2_ORIGINALS_BUCKET as <folder>/<name>.<ext> (skipped if that is not set).
 
 import sharp from 'sharp';
 import {
@@ -17,6 +18,8 @@ const FORMATS = {
 	webp: (img) => img.webp({ quality: 78 }),
 };
 const MANIFEST_KEY = 'manifest.json';
+const ORIGINAL_FORMATS = { jpeg: 'jpg', png: 'png', webp: 'webp', avif: 'avif', tiff: 'tif', heif: 'heic' };
+const MAX_PIXELS = 200_000_000;
 
 export const slugify = (name) =>
 	name
@@ -42,6 +45,8 @@ export function createStore(env) {
 	}
 
 	const bucket = env.R2_BUCKET;
+	const originalsBucket = env.R2_ORIGINALS_BUCKET || null;
+	if (originalsBucket === bucket) throw new Error('R2_ORIGINALS_BUCKET must be a separate, private bucket');
 	const baseUrl = env.R2_PUBLIC_URL.replace(/\/+$/, '');
 	const s3 = new S3Client({
 		region: 'auto',
@@ -50,8 +55,16 @@ export function createStore(env) {
 		credentials: { accessKeyId: env.R2_ACCESS_KEY_ID, secretAccessKey: env.R2_SECRET_ACCESS_KEY },
 	});
 
-	const put = (key, body, contentType, cacheControl = 'public, max-age=31536000, immutable') =>
-		s3.send(new PutObjectCommand({ Bucket: bucket, Key: key, Body: body, ContentType: contentType, CacheControl: cacheControl }));
+	const put = (key, body, contentType, cacheControl = 'public, max-age=31536000, immutable', target = bucket) =>
+		s3.send(new PutObjectCommand({ Bucket: target, Key: key, Body: body, ContentType: contentType, CacheControl: cacheControl }));
+
+	const deleteKeys = async (keys, target = bucket) => {
+		for (let i = 0; i < keys.length; i += 1000) {
+			await s3.send(
+				new DeleteObjectsCommand({ Bucket: target, Delete: { Objects: keys.slice(i, i + 1000).map((Key) => ({ Key })) } })
+			);
+		}
+	};
 
 	const listKeys = async (prefix) => {
 		const keys = [];
@@ -86,9 +99,10 @@ export function createStore(env) {
 		async addPhoto(folder, fileName, buffer) {
 			const name = slugify(fileName);
 			if (!name) throw new Error(`Invalid file name "${fileName}"`);
-			const source = sharp(buffer, { failOn: 'error' }).rotate();
-			const meta = await source.metadata();
-			if (!meta.width || !meta.height) throw new Error(`"${fileName}" is not an image`);
+			const source = sharp(buffer, { failOn: 'error', limitInputPixels: MAX_PIXELS }).rotate();
+			const meta = await source.metadata().catch(() => ({}));
+			const ext = ORIGINAL_FORMATS[meta.format];
+			if (!ext || !meta.width || !meta.height) throw new Error(`"${fileName}" is not a supported image (JPEG, PNG, WebP, AVIF, TIFF, HEIC)`);
 			const rotated = (meta.orientation ?? 1) >= 5;
 			const width = rotated ? meta.height : meta.width;
 			const height = rotated ? meta.width : meta.height;
@@ -101,23 +115,23 @@ export function createStore(env) {
 					await put(`${folder}/${name}/${w}.${ext}`, await encode(resized.clone()).toBuffer(), `image/${ext}`);
 				}
 			}
-			const original = `originals/${folder}/${fileName}`;
-			await put(original, buffer, `image/${meta.format === 'jpeg' ? 'jpeg' : meta.format}`, 'private, no-store');
-
-			return { folder, name, width, height, widths, original };
+			const entry = { folder, name, width, height, widths };
+			if (originalsBucket) {
+				const original = `${folder}/${name}.${ext}`;
+				await put(original, buffer, `image/${meta.format}`, 'private, no-store', originalsBucket);
+				entry.original = original;
+			}
+			return entry;
 		},
 
 		/** Deletes every stored size of a photo and its original. */
 		async deletePhoto(photo) {
-			const keys = await listKeys(`${photo.folder}/${photo.name}/`);
-			if (photo.original) keys.push(photo.original);
-			for (let i = 0; i < keys.length; i += 1000) {
-				await s3.send(
-					new DeleteObjectsCommand({
-						Bucket: bucket,
-						Delete: { Objects: keys.slice(i, i + 1000).map((Key) => ({ Key })) },
-					})
-				);
+			await deleteKeys(await listKeys(`${photo.folder}/${photo.name}/`));
+			if (photo.original && originalsBucket && !photo.original.startsWith('originals/')) {
+				await deleteKeys([photo.original], originalsBucket);
+			} else if (photo.original?.startsWith('originals/')) {
+				// Originals from before R2_ORIGINALS_BUCKET existed sit in the public bucket.
+				await deleteKeys([photo.original]);
 			}
 		},
 	};

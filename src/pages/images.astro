@@ -5,8 +5,6 @@ import series from '../data/series.json';
 import { getManifest } from '../lib/manifest';
 import { getCover } from '../lib/photos';
 
-export const prerender = false;
-
 const manifest = await getManifest();
 const covers = series.map((s) => getCover(manifest, s));
 
