@@ -83,7 +83,9 @@ export function createStore(env) {
 		/** Returns the manifest stored in R2, or null if there is none yet. */
 		async getManifest() {
 			try {
-				const res = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: MANIFEST_KEY }));
+				const res = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: MANIFEST_KEY }), {
+					abortSignal: AbortSignal.timeout(5000),
+				});
 				return JSON.parse(await res.Body.transformToString());
 			} catch (error) {
 				if (error.$metadata?.httpStatusCode === 404 || error.name === 'NoSuchKey') return null;
