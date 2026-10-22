@@ -1,18 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import R2Picture from '../components/R2Picture.astro';
 import series from '../data/series.json';
-type CoverImage = import('astro').ImageMetadata;
+import { getPhoto } from '../lib/photos';
 
-const coverModules = import.meta.glob<CoverImage>('../assets/cover/*.{jpg,jpeg,png,webp,avif}', {
-	import: 'default',
-	eager: true,
-});
-
-const coverByName = Object.fromEntries(
-	Object.entries(coverModules).map(([path, image]) => [path.split('/').pop() ?? path, image])
-);
-
-const getCoverSrc = (cover: string) => coverByName[cover.split('/').pop() ?? cover]?.src ?? cover;
+const getCover = (cover: string) => {
+	const photo = getPhoto('cover', cover);
+	if (!photo) throw new Error(`Cover "${cover}" not found in src/data/photos.json`);
+	return photo;
+};
 
 ---
 
@@ -28,10 +24,11 @@ const getCoverSrc = (cover: string) => coverByName[cover.split('/').pop() ?? cov
 				<article class={`work-item ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug}>
 					<div class="img-wrap">
 						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Open ${s.title} series`}>
-							<img
+							<R2Picture
+								photo={getCover(s.cover)}
 								class={`series-cover ${s.slug === 'astro' ? 'series-cover--astro' : ''}`}
-									src={getCoverSrc(s.cover)}
 								alt={`${s.title} cover`}
+								sizes="(min-width: 900px) 50vw, 100vw"
 								loading={i === 0 ? 'eager' : 'lazy'}
 								decoding="auto"
 								fetchpriority={i === 0 ? 'high' : 'low'}

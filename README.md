@@ -1,43 +1,27 @@
-# Astro Starter Kit: Minimal
+# mathisheck.de
+
+Astro site, built with the `DOCKERFILE` and deployed on Dokploy.
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+npm run dev     # localhost:4321
+npm run build   # ./dist
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Photos (Cloudflare R2)
 
-## 🚀 Project Structure
+Photos are not stored in this repo. They live in a Cloudflare R2 bucket as AVIF + WebP
+in widths 360, 640, 960, 1280, 1600 and 2000 px. `src/data/photos.json` lists them and is
+what the site builds from.
 
-Inside of your Astro project, you'll see the following folders and files:
+Add or change photos:
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+1. Put the originals in `photos/<folder>/` (gitignored). `<folder>` is the `folder` from
+   `src/data/series.json`; covers go in `photos/cover/` and are referenced by `cover`.
+2. Copy `.env.example` to `.env` and fill in the R2 values.
+3. `npm run photos:upload` converts and uploads new photos and rewrites `src/data/photos.json`.
+   `--force` re-uploads everything, `--dry-run` only rewrites the manifest.
+4. Commit `src/data/photos.json` and push. Dokploy redeploys.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Removing a photo: delete it from `photos/`, run the script, commit. The files stay in R2
+until you delete them there.

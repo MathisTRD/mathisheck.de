@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# original photos (live in Cloudflare R2, see scripts/upload-photos.mjs)
+photos/
