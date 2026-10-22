@@ -320,9 +320,10 @@ body {
 }
 
 .series-gallery {
-	column-width: 18rem;
+	column-width: 17rem;
 	column-gap: var(--space-4);
-	width: 100%;
+	/* Break out of the content column: the gallery spans the full width, minus the page gutter */
+	margin-inline: calc(var(--gutter) - max(var(--gutter), (100vw - var(--content-max)) / 2));
 }
 
 .series-gallery-trigger {

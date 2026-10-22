@@ -75,7 +75,7 @@ const altOf = (photo: (typeof photos)[number]) =>
 						baseUrl={manifest.baseUrl}
 						alt={altOf(photo)}
 						maxWidth={1280}
-						sizes="(min-width: 900px) 33vw, 100vw"
+						sizes="(min-width: 1800px) 20vw, (min-width: 900px) 25vw, 100vw"
 						loading={index < 3 ? 'eager' : 'lazy'}
 					/>
 				</button>
