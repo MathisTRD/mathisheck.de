@@ -21,6 +21,9 @@ const MANIFEST_KEY = 'manifest.json';
 const ORIGINAL_FORMATS = { jpeg: 'jpg', png: 'png', webp: 'webp', avif: 'avif', tiff: 'tif', heif: 'heic' };
 const MAX_PIXELS = 200_000_000;
 
+// libvips keeps decoded images in a cache by default; on a small server that memory adds up across uploads.
+sharp.cache(false);
+
 export const slugify = (name) =>
 	name
 		.toLowerCase()

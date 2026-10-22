@@ -40,6 +40,7 @@ Astro.response.headers.set('Cache-Control', 'no-store');
 			.queue { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: 0.25rem; font-size: 0.9rem; }
 			.queue .err, .card .status.err { color: #b00020; }
 			.queue .ok, .card .status.ok { color: #1b7f3b; }
+			.queue button { font: inherit; font-size: 0.85rem; padding: 0.35rem 0.8rem; border: 1px solid #ccc; background: #fff; border-radius: 6px; cursor: pointer; }
 			.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 1.25rem; }
 			.card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
 			.card.no-subject { outline: 2px solid #e0a100; }
@@ -274,31 +275,64 @@ Astro.response.headers.set('Cache-Control', 'no-store');
 			const drop = document.getElementById('drop');
 			const input = document.getElementById('file');
 			const queue = document.getElementById('queue');
-			const upload = async (files) => {
-				const subject = document.getElementById('upload-subject').value;
-				const tags = [...document.querySelectorAll('[name="upload-tag"]:checked')].map((b) => b.value);
-				let uploaded = 0;
-				for (const file of files) {
-					const row = document.createElement('li');
-					row.textContent = `${file.name}: wird konvertiert und hochgeladen …`;
-					queue.append(row);
+			// Retries network errors and server/proxy errors (5xx), e.g. a dropped connection or a Cloudflare timeout.
+			// Uploading the same file again just overwrites it, so a retry is safe even if the first try got through.
+			const RETRY_DELAYS = [3000, 10000];
+			const describe = (status) =>
+				({ 413: 'Datei zu groß', 502: 'Server nicht erreichbar (502)', 503: 'Server nicht verfügbar (503)', 504: 'Zeitüberschreitung (504)', 524: 'Zeitüberschreitung bei Cloudflare (524)' })[status] ??
+				`HTTP ${status}`;
+			const sendFile = async (file, subject, tags, row) => {
+				for (let attempt = 0; ; attempt++) {
 					const body = new FormData();
 					body.append('subject', subject);
 					tags.forEach((tag) => body.append('tag', tag));
 					body.append('file', file);
+					let error, retry;
 					try {
 						const res = await fetch('/api/admin/photos', { method: 'POST', headers, body });
 						const data = await res.json().catch(() => ({}));
-						if (!res.ok) throw new Error(data.error || res.statusText);
+						if (res.ok) return;
+						error = data.error || describe(res.status);
+						retry = res.status >= 500 || res.status === 408 || res.status === 429;
+					} catch {
+						error = 'Verbindung abgebrochen';
+						retry = true;
+					}
+					if (!retry || attempt >= RETRY_DELAYS.length) throw new Error(error);
+					row.textContent = `${file.name}: ${error}, neuer Versuch ${attempt + 2} von ${RETRY_DELAYS.length + 1} …`;
+					await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS[attempt]));
+				}
+			};
+
+			const upload = async (files) => {
+				const subject = document.getElementById('upload-subject').value;
+				const tags = [...document.querySelectorAll('[name="upload-tag"]:checked')].map((b) => b.value);
+				const failed = [];
+				for (const file of files) {
+					const row = document.createElement('li');
+					row.textContent = `${file.name}: wird konvertiert und hochgeladen …`;
+					queue.append(row);
+					try {
+						await sendFile(file, subject, tags, row);
 						row.textContent = `${file.name}: fertig`;
 						row.className = 'ok';
-						uploaded++;
 					} catch (e) {
 						row.textContent = `${file.name}: Fehler – ${e.message}`;
 						row.className = 'err';
+						failed.push(file);
 					}
 				}
-				if (uploaded === files.length) location.reload();
+				if (!failed.length) return location.reload();
+				const again = document.createElement('li');
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.textContent = `${failed.length} fehlgeschlagene erneut hochladen`;
+				button.addEventListener('click', () => {
+					again.remove();
+					upload(failed);
+				});
+				again.append(button);
+				queue.append(again);
 			};
 
 			input.addEventListener('change', () => input.files.length && upload([...input.files]));
