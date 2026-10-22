@@ -1,38 +1,33 @@
 # mathisheck.de
 
-Astro site, built with the `DOCKERFILE` and deployed on Dokploy.
+Personal photography portfolio, built with [Astro](https://astro.build) and Tailwind CSS
+and rendered on the server with the Node adapter.
+
+## Development
+
+Requires Node.js 22.23.4 or newer.
 
 ```sh
 npm install
-npm run dev     # localhost:4321
-npm run build   # ./dist
+npm run dev     # http://localhost:4321
+npm run build   # production build in ./dist
+npm start       # serve the build on port 3000
 ```
 
-## Photos (Cloudflare R2)
+Copy `.env.example` to `.env` and fill in the values. Without them the site still runs
+with the bundled photo list in `src/data/photos.json`.
 
-Photos live in a Cloudflare R2 bucket, not in this repo: AVIF + WebP in widths
-360–2000 px under `<folder>/<name>/`, the originals under `originals/`, and the list of
-all photos in `manifest.json`. The gallery pages read that manifest at request time, so
-new photos show up without a redeploy.
+## How it works
 
-### Upload page
+- **Photos** are stored in Cloudflare R2, not in this repository. Each photo is converted
+  to AVIF and WebP in several widths and served with responsive `srcset`. A
+  `manifest.json` in the bucket lists all photos, so new uploads appear without a redeploy.
+- **Admin page** (`/admin`) uploads, deletes and picks series covers. It sits behind
+  Cloudflare Access, and the server also verifies the Access token and an email allowlist.
+- **Bulk upload**: `npm run photos:upload` converts and uploads everything in
+  `photos/<series>/` that is not in the manifest yet.
 
-`https://mathisheck.de/admin`: pick a series, drop photos in, done. Each photo can also be
-deleted or set as the series cover. Originals go to the private `R2_ORIGINALS_BUCKET`.
+## Deployment
 
-`/admin` and `/api/admin/*` are protected by **Cloudflare Access** (login at Cloudflare,
-with 2FA). The server additionally verifies the Access JWT and the email against
-`ADMIN_EMAILS`, so requests that bypass Cloudflare are rejected. Without the
-`CF_ACCESS_*` / `ADMIN_EMAILS` env vars the admin area is disabled.
-
-### Server setup (Dokploy)
-
-Set the variables from `.env.example` in the app's Environment. The container runs as a
-non-root user on port **3000**.
-
-### Bulk upload from the PC
-
-Put originals in `photos/<folder>/` (gitignored), fill in `.env`, run
-`npm run photos:upload`. Photos already in the manifest are skipped; `--force` re-uploads.
-
-`src/data/photos.json` is only a fallback for when R2 is unreachable or not configured.
+The `DOCKERFILE` builds a production image that runs as a non-root user on port 3000.
+Configuration comes from the environment variables listed in `.env.example`.
