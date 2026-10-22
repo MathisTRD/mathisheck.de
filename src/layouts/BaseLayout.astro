@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import SiteHeader from '../components/SiteHeader.astro';
+import { UMAMI_SCRIPT_URL, UMAMI_WEBSITE_ID } from 'astro:env/server';
 
 const { title = 'Mathis Heck', description = '' } = Astro.props;
 ---
@@ -14,6 +15,9 @@ const { title = 'Mathis Heck', description = '' } = Astro.props;
 		<link rel="shortcut icon" href="/favicon.svg" />
 		<title>{title}</title>
 		{description ? <meta name="description" content={description} /> : null}
+		{UMAMI_SCRIPT_URL && UMAMI_WEBSITE_ID ? (
+			<script is:inline defer src={UMAMI_SCRIPT_URL} data-website-id={UMAMI_WEBSITE_ID} data-do-not-track="true" />
+		) : null}
 	</head>
 	<body>
 		<SiteHeader />
