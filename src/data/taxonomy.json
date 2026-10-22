@@ -1,0 +1,11 @@
+{
+  "subjects": [
+    { "slug": "street", "title": "Street" },
+    { "slug": "concert", "title": "Konzerte" },
+    { "slug": "astro", "title": "Astro" }
+  ],
+  "tags": [
+    { "slug": "bw", "title": "Schwarzweiß" },
+    { "slug": "color", "title": "Farbe" }
+  ]
+}

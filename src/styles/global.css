@@ -275,87 +275,55 @@ body {
 	align-content: start;
 }
 
-.work {
-	display: grid;
-	gap: var(--section-gap);
-}
-
-.work-item {
-	display: grid;
-	/* same columns as .hero-split so text starts on the same line on every page */
-	grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+.filter-bar {
+	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
-	gap: var(--section-gap);
+	gap: var(--space-2);
+	margin-top: calc(var(--section-gap) / -2);
 }
 
-.work-item--reverse {
-	grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-}
-
-.work-item--reverse .img-wrap {
-	order: 2;
-}
-
-.series-cover-link {
-	display: block;
-	overflow: hidden;
-	border-radius: var(--radius);
-}
-
-.series-cover {
-	display: block;
-	width: 100%;
-	aspect-ratio: 5 / 4;
-	object-fit: cover;
-	object-position: center center;
-	transition: transform 300ms ease;
-}
-
-.series-cover-link:hover .series-cover {
-	transform: scale(1.02);
-}
-
-.series-cover--astro {
-	object-position: center bottom;
-}
-
-.series-meta {
-	display: grid;
-	gap: var(--space-4);
-	justify-items: start;
-}
-
-.series-meta h2 {
-	margin: 0;
-	font-size: var(--text-xl);
+.filter-chip {
+	padding: var(--space-2) var(--space-4);
+	border: 1px solid var(--color-line);
+	border-radius: 999px;
+	color: var(--color-muted);
+	font-size: var(--text-sm);
 	font-weight: var(--weight-medium);
-	line-height: var(--leading-snug);
+	line-height: 1.2;
+	text-decoration: none;
+	transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
-.series-meta p {
+.filter-chip:hover,
+.filter-chip:focus-visible {
+	border-color: var(--color-ink);
+	color: var(--color-ink);
+}
+
+.filter-chip[aria-current='true'] {
+	border-color: var(--color-ink);
+	background: var(--color-ink);
+	color: #ffffff;
+}
+
+.filter-divider {
+	width: 1px;
+	height: 1.25rem;
+	margin-inline: var(--space-2);
+	background: var(--color-line);
+}
+
+.gallery-empty {
 	margin: 0;
-	max-width: 44ch;
-	font-size: var(--text-base);
-	line-height: var(--leading-body);
 	color: var(--color-muted);
 }
 
-.series-meta .button {
-	margin-top: var(--space-2);
-}
-
-/* ---------- Series page ---------- */
-
-.series-page {
-	display: grid;
-	gap: var(--section-gap);
-	align-content: start;
-}
-
 .series-gallery {
-	column-width: 18rem;
+	column-width: 17rem;
 	column-gap: var(--space-4);
-	width: 100%;
+	/* Break out of the content column: the gallery spans the full width, minus the page gutter */
+	margin-inline: calc(var(--gutter) - max(var(--gutter), (100vw - var(--content-max)) / 2));
 }
 
 .series-gallery-trigger {
@@ -369,6 +337,10 @@ body {
 	background: transparent;
 	cursor: zoom-in;
 	break-inside: avoid;
+}
+
+.series-gallery-trigger[hidden] {
+	display: none;
 }
 
 .series-gallery-trigger img {
@@ -386,14 +358,6 @@ body {
 .series-gallery-trigger:focus-visible {
 	outline: 2px solid var(--color-ink);
 	outline-offset: 2px;
-}
-
-.button--back {
-	justify-self: start;
-}
-
-.button--back::before {
-	content: '←';
 }
 
 /* ---------- Contact ---------- */
@@ -611,23 +575,10 @@ body {
 /* ---------- Tablet & mobile ---------- */
 
 @media (max-width: 900px) {
-	.hero-split,
-	.work-item {
+	.hero-split {
 		grid-template-columns: 1fr;
 		align-self: start;
 		gap: var(--space-6);
-	}
-
-	.work {
-		gap: var(--space-8);
-	}
-
-	.work-item {
-		gap: var(--space-4);
-	}
-
-	.work-item--reverse .img-wrap {
-		order: 0;
 	}
 
 	.hero-image {
@@ -638,20 +589,18 @@ body {
 
 	/* Stacked layouts: center every text block on the column */
 	.page-intro,
-	.series-meta,
 	.contact-links,
 	.info-block {
 		justify-items: center;
 		text-align: center;
 	}
 
-	.lead,
-	.series-meta p {
+	.lead {
 		margin-inline: auto;
 	}
 
-	.button--back {
-		justify-self: center;
+	.filter-bar {
+		justify-content: center;
 	}
 }
 
@@ -708,9 +657,19 @@ body {
 		font-size: var(--text-base);
 	}
 
+	/* Two columns keep portrait photos from filling the whole screen; tap opens them large */
 	.series-gallery {
 		column-width: auto;
-		column-count: 1;
+		column-count: 2;
+		column-gap: var(--space-2);
+	}
+
+	.series-gallery-trigger {
+		margin-bottom: var(--space-2);
+	}
+
+	.filter-divider {
+		display: none;
 	}
 
 	.lightbox-shell {

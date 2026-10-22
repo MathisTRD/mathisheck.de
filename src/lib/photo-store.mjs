@@ -139,10 +139,19 @@ export function createStore(env) {
 	};
 }
 
-/** Returns a copy of the manifest with the entry inserted or replaced, sorted by folder and name. */
-export const upsertPhoto = (manifest, entry) => ({
-	...manifest,
-	photos: [...manifest.photos.filter((p) => !(p.folder === entry.folder && p.name === entry.name)), entry].sort(
-		(a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name)
-	),
-});
+/**
+ * Returns a copy of the manifest with the entry inserted or replaced, sorted by folder and name.
+ * A replaced photo keeps its subject and tags unless the entry sets them.
+ */
+export const upsertPhoto = (manifest, entry) => {
+	const same = (p) => p.folder === entry.folder && p.name === entry.name;
+	const existing = manifest.photos.find(same);
+	const merged = existing ? { subject: existing.subject, tags: existing.tags, ...entry } : entry;
+	for (const key of ['subject', 'tags']) if (merged[key] === undefined) delete merged[key];
+	return {
+		...manifest,
+		photos: [...manifest.photos.filter((p) => !same(p)), merged].sort(
+			(a, b) => a.folder.localeCompare(b.folder) || a.name.localeCompare(b.name)
+		),
+	};
+};
