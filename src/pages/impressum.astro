@@ -3,122 +3,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Impressum | Mathis Heck" description="Impressum von Mathis Heck">
-	<style>
-		/* Keep the impressum page in the same split structure as contact */
-		html, body { overflow: hidden; height: 100%; }
-		.portfolio {
-			min-height: 90vh;
-			padding-top: 1.75rem;
-			padding-bottom: 0.75rem;
-			gap: 1.4rem;
-		}
-		.hero-split {
-			padding-top: 1.8rem;
-			padding-bottom: 0.9rem;
-		}
-		.impressum-hero {
-			gap: clamp(1.5rem, 4vw, 3rem);
-		}
-		.impressum-copy {
-			text-align: left;
-			max-width: 48ch;
-			display: grid;
-			gap: 0.6rem;
-		}
-
-		.impressum-heading {
-			margin: 0;
-			font-family: "Plus Jakarta Sans", Arial, sans-serif;
-			font-size: clamp(2rem, 4.2vw, 3.2rem);
-			line-height: 1;
-			font-weight: 500;
-			color: #111111;
-		}
-
-		.impressum-lead {
-			margin: 0;
-			font-size: 1.04rem;
-			line-height: 1.8;
-			color: rgba(17, 17, 17, 0.78);
-		}
-
-		.impressum-details {
-			display: flex;
-			flex-direction: column;
-			gap: 1.2rem;
-			justify-content: center;
-			align-items: flex-end;
-			text-align: right;
-		}
-
-		.impressum-block {
-			display: grid;
-			gap: 0.45rem;
-			width: fit-content;
-			max-width: 22rem;
-		}
-
-		.impressum-block p {
-			margin: 0;
-		}
-
-		.impressum-label {
-			font-size: 1.2rem;
-			letter-spacing: 0.22em;
-			text-transform: uppercase;
-			font-weight: 600;
-			color: #111111;
-		}
-
-		.impressum-text {
-			font-size: 1.05rem;
-			line-height: 1.8;
-			color: rgba(17, 17, 17, 0.82);
-		}
-
-		.impressum-text a {
-			color: inherit;
-			text-decoration-thickness: 1px;
-			text-underline-offset: 0.15em;
-		}
-
-		@media (max-width: 900px) {
-			.impressum-details {
-				align-items: center;
-				text-align: center;
-			}
-		}
-
-		@media (max-width: 760px) {
-			.impressum-copy,
-			.impressum-details {
-				text-align: left;
-				align-items: flex-start;
-				max-width: none;
-			}
-		}
-	</style>
-	<section class="hero-split impressum-hero" aria-label="Impressum">
-		<div class="impressum-copy">
+	<section class="hero-split" aria-label="Impressum">
+		<div class="page-intro">
 			<p class="eyebrow fade-item" style="--i:0">Impressum</p>
-			<h1 class="impressum-heading fade-item" style="--i:1">Rechtliche Angaben.</h1>
-			<p class="impressum-lead fade-item" style="--i:2">
+			<h1 class="page-title fade-item" style="--i:1">Rechtliche Angaben.</h1>
+			<p class="lead fade-item" style="--i:2">
 				Hier stehen die Anbieter- und Kontaktdaten für diese Website.
 			</p>
 		</div>
 
-		<div class="impressum-details" aria-label="Impressum details">
-			<div class="impressum-block fade-item" style="--i:3">
-				<p class="impressum-label">Anbieter</p>
-				<p class="impressum-text">
+		<div class="info-list" aria-label="Angaben">
+			<div class="info-block fade-item" style="--i:3">
+				<p class="eyebrow">Anbieter</p>
+				<p class="info-text">
 					Mathis Heck<br />
 					54292 Trier
 				</p>
 			</div>
 
-			<div class="impressum-block fade-item" style="--i:4">
-				<p class="impressum-label">Kontakt</p>
-				<p class="impressum-text">
+			<div class="info-block fade-item" style="--i:4">
+				<p class="eyebrow">Kontakt</p>
+				<p class="info-text">
 					Telefon: +49 01520 2833263<br />
 					E-Mail: <a href="mailto:kontakt@mathisheck.de">kontakt@mathisheck.de</a><br />
 					Website: <a href="https://www.mathisheck.de" target="_blank" rel="noreferrer">www.mathisheck.de</a>

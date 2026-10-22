@@ -20,11 +20,14 @@ export type Photo = {
 	height: number;
 	widths: number[];
 	original?: string;
+	/** One of taxonomy.json's subjects; null means none. Missing on photos from before subjects existed. */
+	subject?: string | null;
+	/** Slugs of taxonomy.json's tags. */
+	tags?: string[];
 };
 export type Manifest = {
 	baseUrl: string;
 	photos: Photo[];
-	covers?: Record<string, { folder: string; name: string }>;
 };
 
 const env = { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_URL, R2_JURISDICTION, R2_ORIGINALS_BUCKET };

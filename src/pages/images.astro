@@ -1,62 +1,264 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import R2Picture from '../components/R2Picture.astro';
-import series from '../data/series.json';
 import { getManifest } from '../lib/manifest';
-import { getCover } from '../lib/photos';
+import { galleryPhotos, subjectOf, subjects, tags, tagsOf } from '../lib/photos';
 
 const manifest = await getManifest();
-const covers = series.map((s) => getCover(manifest, s));
+const photos = galleryPhotos(manifest);
+const titles = Object.fromEntries([...subjects, ...tags].map((t) => [t.slug, t.title]));
 
+// The active filter comes from the URL, so filtered views can be linked and work without JavaScript.
+const params = Astro.url.searchParams;
+const activeSubject = subjects.some((s) => s.slug === params.get('motiv')) ? params.get('motiv') : null;
+const activeTag = tags.some((t) => t.slug === params.get('tag')) ? params.get('tag') : null;
+const matches = (photo: (typeof photos)[number]) =>
+	(!activeSubject || subjectOf(photo) === activeSubject) && (!activeTag || tagsOf(photo).includes(activeTag));
+
+const filterHref = (key: 'motiv' | 'tag', slug: string | null) => {
+	const next = { motiv: activeSubject, tag: activeTag, [key]: slug };
+	const query = new URLSearchParams(Object.entries(next).filter((e): e is [string, string] => Boolean(e[1])));
+	return query.size ? `/images?${query}` : '/images';
+};
+const altOf = (photo: (typeof photos)[number]) =>
+	[subjectOf(photo), ...tagsOf(photo)].filter(Boolean).map((slug) => titles[slug!]).join(', ') || 'Foto';
 ---
 
-<BaseLayout title="Images | Mathis Heck" description="Selected photography series by Mathis Heck">
-	<section class="images-page" aria-label="Selected work">
-		<header class="images-header">
-			<p class="eyebrow">Images</p>
-			<h1 class="series-placeholder-title">Selected series.</h1>
+<BaseLayout title="Bilder | Mathis Heck" description="Fotografie von Mathis Heck: Street, Konzerte und Astro">
+	<section class="images-page" aria-label="Bilder">
+		<header class="page-intro fade-item" style="--i:0">
+			<p class="eyebrow">Bilder</p>
+			<h1 class="page-title">Ausgewählte Arbeiten.</h1>
 		</header>
 
-		<section class="work" aria-label="Series overview">
-			{series.map((s, i) => (
-				<article class={`work-item ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug}>
-					<div class="img-wrap">
-						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Open ${s.title} series`}>
-{covers[i] && (
-							<R2Picture
-								photo={covers[i]}
-								baseUrl={manifest.baseUrl}
-								class={`series-cover ${s.slug === 'astro' ? 'series-cover--astro' : ''}`}
-								alt={`${s.title} cover`}
-								sizes="(min-width: 900px) 50vw, 100vw"
-								loading={i === 0 ? 'eager' : 'lazy'}
-								decoding="auto"
-								fetchpriority={i === 0 ? 'high' : 'low'}
-							/>
-							)}
-						</a>
-					</div>
-					<div class="series-meta">
-						<h2>{s.title}</h2>
-						<p>{s.description}</p>
-						<a href={`/images/${s.slug}`} class="series-link">View series →</a>
-					</div>
-				</article>
+		<nav class="filter-bar fade-item" style="--i:1" aria-label="Bilder filtern" data-filters>
+			<a class="filter-chip" href="/images" data-filter-all aria-current={!activeSubject && !activeTag ? 'true' : undefined}>Alle</a>
+			{subjects.map((s) => (
+				<a
+					class="filter-chip"
+					href={filterHref('motiv', activeSubject === s.slug ? null : s.slug)}
+					data-filter-key="motiv"
+					data-filter-value={s.slug}
+					aria-current={activeSubject === s.slug ? 'true' : undefined}
+				>
+					{s.title}
+				</a>
+			))}
+			<span class="filter-divider" aria-hidden="true"></span>
+			{tags.map((t) => (
+				<a
+					class="filter-chip"
+					href={filterHref('tag', activeTag === t.slug ? null : t.slug)}
+					data-filter-key="tag"
+					data-filter-value={t.slug}
+					aria-current={activeTag === t.slug ? 'true' : undefined}
+				>
+					{t.title}
+				</a>
+			))}
+		</nav>
+
+		<section class="series-gallery" aria-label="Galerie" data-gallery>
+			{photos.map((photo, index) => (
+				<button
+					class="series-gallery-trigger fade-item"
+					type="button"
+					data-lightbox-trigger={index}
+					data-motiv={subjectOf(photo) ?? ''}
+					data-tags={tagsOf(photo).join(' ')}
+					hidden={!matches(photo)}
+					style={`--i:${Math.min(index + 2, 12)};`}
+					aria-label={`${altOf(photo)}, Bild öffnen`}
+				>
+					<R2Picture
+						photo={photo}
+						baseUrl={manifest.baseUrl}
+						alt={altOf(photo)}
+						maxWidth={1280}
+						sizes="(min-width: 1800px) 20vw, (min-width: 900px) 25vw, (min-width: 701px) 33vw, 50vw"
+						loading={index < 3 ? 'eager' : 'lazy'}
+					/>
+				</button>
 			))}
 		</section>
+
+		<p class="gallery-empty" data-gallery-empty hidden={photos.some(matches)}>Keine Bilder für diesen Filter.</p>
+
+		{photos.length > 0 ? (
+			<div class="lightbox" data-lightbox hidden aria-hidden="true">
+				<button class="lightbox-backdrop" type="button" data-lightbox-close aria-label="Vergrößerung schließen"></button>
+				<div class="lightbox-shell" role="presentation">
+					<button class="lightbox-zone lightbox-zone--prev" type="button" data-lightbox-prev aria-label="Vorheriges Bild"></button>
+					<div class="lightbox-stage" aria-label="Vergrößertes Bild">
+						{photos.map((photo, index) => (
+							<figure class="lightbox-item" data-lightbox-item={index} hidden>
+								<R2Picture photo={photo} baseUrl={manifest.baseUrl} alt={altOf(photo)} sizes="100vw" loading="lazy" />
+							</figure>
+						))}
+					</div>
+					<button class="lightbox-zone lightbox-zone--next" type="button" data-lightbox-next aria-label="Nächstes Bild"></button>
+				</div>
+			</div>
+		) : null}
 	</section>
 
-		<style is:inline>
-			.images-page .fade-item,
-			.images-page .reveal-on-scroll,
-			.images-page .work-item,
-			.images-page .series-cover,
-			.images-page .series-meta {
-				opacity: 1 !important;
-				transform: none !important;
-				filter: none !important;
-				animation: none !important;
-				transition: none !important;
-			}
-		</style>
+	<style is:inline>
+		.lightbox-stage {
+			position: relative;
+			width: fit-content;
+			height: fit-content;
+			max-width: 92vw;
+			max-height: 88vh;
+		}
+		.lightbox-item {
+			margin: 0;
+			display: none;
+			align-items: center;
+			justify-content: center;
+			width: auto;
+			height: auto;
+			max-width: 92vw;
+			max-height: 88vh;
+			background: transparent;
+			box-shadow: none;
+			border-radius: 0;
+			overflow: visible;
+		}
+		.lightbox-item img { display: block; max-width: 92vw; max-height: 88vh; width: auto; height: auto; }
+		.lightbox-item.is-active { display: flex; pointer-events: auto; }
+		.lightbox-shell {
+			position: relative;
+			z-index: 1;
+			display: inline-flex;
+			width: fit-content;
+			height: fit-content;
+			align-items: center;
+			justify-content: center;
+			pointer-events: none;
+		}
+		.lightbox-zone {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+		.lightbox-zone--prev {
+			left: 0;
+			transform: translate(calc(-100% - 0.75rem), -50%);
+			margin-right: 0;
+		}
+		.lightbox-zone--next {
+			right: 0;
+			transform: translate(calc(100% + 0.75rem), -50%);
+			margin-left: 0;
+		}
+	</style>
+
+	<script is:inline>
+		const triggers = Array.from(document.querySelectorAll('[data-lightbox-trigger]'));
+		const visible = () => triggers.filter((t) => !t.hidden).map((t) => Number(t.dataset.lightboxTrigger));
+
+		// Filters: switch without reloading, keep the URL in sync.
+		const bar = document.querySelector('[data-filters]');
+		const empty = document.querySelector('[data-gallery-empty]');
+		if (bar) {
+			const params = new URLSearchParams(location.search);
+			const active = { motiv: params.get('motiv'), tag: params.get('tag') };
+			const setCurrent = (chip, on) => (on ? chip.setAttribute('aria-current', 'true') : chip.removeAttribute('aria-current'));
+			const apply = () => {
+				triggers.forEach((t) => {
+					t.hidden = !(
+						(!active.motiv || t.dataset.motiv === active.motiv) &&
+						(!active.tag || t.dataset.tags.split(' ').includes(active.tag))
+					);
+				});
+				bar.querySelectorAll('[data-filter-key]').forEach((chip) => {
+					setCurrent(chip, active[chip.dataset.filterKey] === chip.dataset.filterValue);
+				});
+				setCurrent(bar.querySelector('[data-filter-all]'), !active.motiv && !active.tag);
+				if (empty) empty.hidden = visible().length > 0;
+				const query = new URLSearchParams(Object.entries(active).filter(([, v]) => v));
+				history.replaceState(null, '', query.size ? `?${query}` : location.pathname);
+			};
+			bar.addEventListener('click', (event) => {
+				const chip = event.target instanceof Element ? event.target.closest('.filter-chip') : null;
+				if (!chip || event.metaKey || event.ctrlKey || event.shiftKey) return;
+				event.preventDefault();
+				if (chip.hasAttribute('data-filter-all')) {
+					active.motiv = active.tag = null;
+				} else {
+					const key = chip.dataset.filterKey;
+					active[key] = active[key] === chip.dataset.filterValue ? null : chip.dataset.filterValue;
+				}
+				apply();
+			});
+		}
+
+		// Lightbox: steps through the photos the current filter shows.
+		const root = document.querySelector('[data-lightbox]');
+		if (root && triggers.length) {
+			const items = Array.from(root.querySelectorAll('[data-lightbox-item]'));
+			const prevButton = root.querySelector('[data-lightbox-prev]');
+			const nextButton = root.querySelector('[data-lightbox-next]');
+			let currentIndex = 0;
+
+			const showItem = (index) => {
+				items.forEach((item, itemIndex) => {
+					const isActive = itemIndex === index;
+					item.hidden = !isActive;
+					item.classList.toggle('is-active', isActive);
+				});
+				currentIndex = index;
+			};
+
+			const step = (direction) => {
+				const order = visible();
+				const position = order.indexOf(currentIndex);
+				showItem(order[(position + direction + order.length) % order.length]);
+			};
+
+			const openLightbox = (index) => {
+				showItem(index);
+				root.hidden = false;
+				root.setAttribute('aria-hidden', 'false');
+				document.body.classList.add('lightbox-open');
+				prevButton?.focus();
+			};
+
+			const closeLightbox = () => {
+				root.hidden = true;
+				root.setAttribute('aria-hidden', 'true');
+				document.body.classList.remove('lightbox-open');
+				triggers[currentIndex]?.focus();
+			};
+
+			triggers.forEach((trigger) => {
+				trigger.addEventListener('click', () => openLightbox(Number(trigger.dataset.lightboxTrigger)));
+			});
+
+			prevButton?.addEventListener('click', () => step(-1));
+			nextButton?.addEventListener('click', () => step(1));
+
+			root.addEventListener('click', (event) => {
+				const target = event.target;
+				if (!(target instanceof Element)) return;
+				if (target.closest('[data-lightbox-prev]') || target.closest('[data-lightbox-next]')) return;
+				closeLightbox();
+			});
+
+			document.addEventListener('keydown', (event) => {
+				if (root.hidden) return;
+				if (event.key === 'Escape') closeLightbox();
+				if (event.key === 'ArrowLeft') step(-1);
+				if (event.key === 'ArrowRight') step(1);
+			});
+
+			// basic touch swipe handling
+			let touchStartX = 0;
+			root.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+			root.addEventListener('touchend', (e) => {
+				const dx = e.changedTouches[0].clientX - touchStartX;
+				if (Math.abs(dx) > 40) step(dx > 0 ? -1 : 1);
+			}, { passive: true });
+		}
+	</script>
 </BaseLayout>
