@@ -17,15 +17,18 @@ new photos show up without a redeploy.
 
 ### Upload page
 
-`https://mathisheck.de/admin` (password: `ADMIN_PASSWORD`, any user name). Pick a series,
-drop photos in, done. Each photo can also be deleted or set as the series cover.
+`https://mathisheck.de/admin`: pick a series, drop photos in, done. Each photo can also be
+deleted or set as the series cover. Originals go to the private `R2_ORIGINALS_BUCKET`.
+
+`/admin` and `/api/admin/*` are protected by **Cloudflare Access** (login at Cloudflare,
+with 2FA). The server additionally verifies the Access JWT and the email against
+`ADMIN_EMAILS`, so requests that bypass Cloudflare are rejected. Without the
+`CF_ACCESS_*` / `ADMIN_EMAILS` env vars the admin area is disabled.
 
 ### Server setup (Dokploy)
 
-Set these in the app's Environment: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
-`R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL`, `ADMIN_PASSWORD`
-(and `R2_JURISDICTION=eu` for an EU bucket). See `.env.example`.
-The container runs a Node server on port 80.
+Set the variables from `.env.example` in the app's Environment. The container runs as a
+non-root user on port **3000**.
 
 ### Bulk upload from the PC
 

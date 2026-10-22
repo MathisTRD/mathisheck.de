@@ -8,8 +8,9 @@ const secret = () => envField.string({ context: 'server', access: 'secret', opti
 
 // https://astro.build/config
 export default defineConfig({
-  // Static pages stay prerendered; the gallery, /admin and /api/admin run on the server.
-  adapter: node({ mode: 'standalone' }),
+  // Every page renders on the server so src/middleware.ts can set security headers on all of them.
+  output: 'server',
+  adapter: node({ mode: 'standalone', bodySizeLimit: 110 * 1024 * 1024 }),
   // Origin checks break behind Dokploy's TLS proxy; /api/admin requires a custom header instead (see src/middleware.ts).
   security: { checkOrigin: false },
   env: {
@@ -18,9 +19,12 @@ export default defineConfig({
       R2_ACCESS_KEY_ID: secret(),
       R2_SECRET_ACCESS_KEY: secret(),
       R2_BUCKET: secret(),
+      R2_ORIGINALS_BUCKET: secret(),
       R2_PUBLIC_URL: secret(),
       R2_JURISDICTION: secret(),
-      ADMIN_PASSWORD: secret(),
+      CF_ACCESS_TEAM_DOMAIN: secret(),
+      CF_ACCESS_AUD: secret(),
+      ADMIN_EMAILS: secret(),
     },
   },
   vite: {

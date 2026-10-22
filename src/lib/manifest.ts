@@ -9,6 +9,7 @@ import {
 	R2_BUCKET,
 	R2_PUBLIC_URL,
 	R2_JURISDICTION,
+	R2_ORIGINALS_BUCKET,
 } from 'astro:env/server';
 import { createStore, hasR2Config, upsertPhoto } from './photo-store.mjs';
 
@@ -26,7 +27,7 @@ export type Manifest = {
 	covers?: Record<string, { folder: string; name: string }>;
 };
 
-const env = { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_URL, R2_JURISDICTION };
+const env = { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_URL, R2_JURISDICTION, R2_ORIGINALS_BUCKET };
 export const store = hasR2Config(env) ? createStore(env) : null;
 
 const TTL = 5 * 60 * 1000;
@@ -45,6 +46,16 @@ export async function getManifest(): Promise<Manifest> {
 	}
 	cached = { manifest, at: Date.now() };
 	return manifest;
+}
+
+// Converts one photo at a time; several large conversions in parallel can exhaust the server's memory.
+let conversions: Promise<unknown> = Promise.resolve();
+
+export function addPhoto(folder: string, fileName: string, buffer: Uint8Array) {
+	if (!store) return Promise.reject(new Error('R2 is not configured'));
+	const run = conversions.then(() => store.addPhoto(folder, fileName, buffer));
+	conversions = run.catch(() => {});
+	return run;
 }
 
 // Serializes manifest writes so parallel uploads don't overwrite each other.
