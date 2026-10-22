@@ -16,6 +16,7 @@
   "dependencies": {
     "@astrojs/node": "^11.1.9",
     "@aws-sdk/client-s3": "^3.1155.0",
+    "@fontsource/plus-jakarta-sans": "^5.3.0",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^7.4.2",
     "jose": "^6.2.13",
