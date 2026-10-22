@@ -52,6 +52,15 @@ Astro.response.headers.set('Cache-Control', 'no-store');
 			.card .name { flex: 1; font-size: 0.7rem; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 			.card button { font: inherit; font-size: 0.8rem; padding: 0.3rem 0.6rem; border: 1px solid #ccc; background: #fafafa; border-radius: 6px; cursor: pointer; }
 			.card button:hover { background: #fde8e8; border-color: #b00020; }
+			.card { position: relative; }
+			.card.is-selected { outline: 3px solid #111; }
+			.card .pick { position: absolute; top: 0.4rem; left: 0.4rem; display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 6px; background: rgba(255,255,255,0.9); box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+			.card .pick input { width: 1.1rem; height: 1.1rem; margin: 0; cursor: pointer; }
+			.selection { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1rem; padding: 0.6rem 0; background: #f7f7f4; font-size: 0.9rem; }
+			.selection button { font: inherit; font-size: 0.85rem; padding: 0.35rem 0.8rem; border: 1px solid #ccc; background: #fff; border-radius: 6px; cursor: pointer; }
+			.selection button:disabled { opacity: 0.45; cursor: default; }
+			.selection .danger:not(:disabled) { border-color: #b00020; color: #b00020; }
+			.selection .danger:not(:disabled):hover { background: #fde8e8; }
 			label { cursor: pointer; }
 			[hidden] { display: none !important; }
 		</style>
@@ -90,6 +99,13 @@ Astro.response.headers.set('Cache-Control', 'no-store');
 			))}
 		</div>
 
+		<div class="selection" role="group" aria-label="Auswahl">
+			<button type="button" data-select-visible>Alle sichtbaren auswählen</button>
+			<button type="button" data-select-none disabled>Auswahl aufheben</button>
+			<span data-selected-count>Keine Fotos ausgewählt</span>
+			<button type="button" class="danger" data-delete-selected disabled>Auswahl löschen</button>
+		</div>
+
 		<section class="grid">
 			{photos.map((photo) => (
 				<div
@@ -99,6 +115,9 @@ Astro.response.headers.set('Cache-Control', 'no-store');
 					data-name={photo.name}
 					data-subject={subjectOf(photo) ?? ''}
 				>
+					<label class="pick" title="Auswählen (Shift für Bereich)">
+						<input type="checkbox" data-pick aria-label={`${photo.name} auswählen`} />
+					</label>
 					<img src={thumb(photo)} alt={photo.name} loading="lazy" />
 					<div class="fields">
 						<select data-subject-select aria-label="Motiv">
@@ -179,22 +198,76 @@ Astro.response.headers.set('Cache-Control', 'no-store');
 				select.addEventListener('change', save);
 				boxes.forEach((box) => box.addEventListener('change', save));
 
-				card.querySelector('[data-delete]').addEventListener('click', async () => {
-					if (!confirm(`${card.dataset.name} wirklich löschen?`)) return;
-					const res = await fetch('/api/admin/photos', {
-						method: 'DELETE',
-						headers: { ...headers, 'content-type': 'application/json' },
-						body: JSON.stringify({ folder: card.dataset.folder, name: card.dataset.name }),
-					});
-					if (!res.ok) {
-						const data = await res.json().catch(() => ({}));
-						alert(data.error || res.statusText);
-						return;
-					}
-					card.remove();
-					cards.splice(cards.indexOf(card), 1);
-					updateCounts();
+				card.querySelector('[data-delete]').addEventListener('click', () => {
+					if (confirm(`${card.dataset.name} wirklich löschen?`)) deleteCards([card]);
 				});
+			});
+
+			// Deleting, one photo or a selection
+			const deleteCards = async (targets) => {
+				const res = await fetch('/api/admin/photos', {
+					method: 'DELETE',
+					headers: { ...headers, 'content-type': 'application/json' },
+					body: JSON.stringify({ photos: targets.map((c) => ({ folder: c.dataset.folder, name: c.dataset.name })) }),
+				});
+				const data = await res.json().catch(() => ({}));
+				const gone = new Set((data.deleted ?? []).map((p) => `${p.folder}/${p.name}`));
+				targets
+					.filter((c) => gone.has(`${c.dataset.folder}/${c.dataset.name}`))
+					.forEach((c) => {
+						c.remove();
+						cards.splice(cards.indexOf(c), 1);
+					});
+				updateCounts();
+				updateSelection();
+				if (!res.ok) alert(`Löschen fehlgeschlagen: ${data.error || res.statusText}`);
+				else if (data.failed?.length) alert(`${data.failed.length} Foto(s) konnten nicht gelöscht werden:\n${data.failed.map((f) => f.name).join('\n')}`);
+			};
+
+			// Selection
+			const selectedCount = document.querySelector('[data-selected-count]');
+			const deleteSelected = document.querySelector('[data-delete-selected]');
+			const selectNone = document.querySelector('[data-select-none]');
+			const selected = () => cards.filter((c) => c.querySelector('[data-pick]').checked);
+			const setPicked = (card, on) => {
+				card.querySelector('[data-pick]').checked = on;
+				card.classList.toggle('is-selected', on);
+			};
+			const updateSelection = () => {
+				const n = selected().length;
+				selectedCount.textContent = n ? `${n} ${n === 1 ? 'Foto' : 'Fotos'} ausgewählt` : 'Keine Fotos ausgewählt';
+				deleteSelected.disabled = selectNone.disabled = n === 0;
+			};
+			let lastPicked = null;
+			cards.forEach((card) => {
+				const box = card.querySelector('[data-pick]');
+				box.addEventListener('click', (event) => {
+					// Shift-click selects every visible photo between the last one clicked and this one
+					if (event.shiftKey && lastPicked && cards.includes(lastPicked)) {
+						const visible = cards.filter((c) => !c.hidden);
+						const [a, b] = [visible.indexOf(lastPicked), visible.indexOf(card)].sort((x, y) => x - y);
+						if (a >= 0) visible.slice(a, b + 1).forEach((c) => setPicked(c, box.checked));
+					}
+					card.classList.toggle('is-selected', box.checked);
+					lastPicked = card;
+					updateSelection();
+				});
+			});
+			document.querySelector('[data-select-visible]').addEventListener('click', () => {
+				cards.filter((c) => !c.hidden).forEach((c) => setPicked(c, true));
+				updateSelection();
+			});
+			selectNone.addEventListener('click', () => {
+				cards.forEach((c) => setPicked(c, false));
+				updateSelection();
+			});
+			deleteSelected.addEventListener('click', async () => {
+				const targets = selected();
+				if (!targets.length) return;
+				if (!confirm(`${targets.length} ${targets.length === 1 ? 'Foto' : 'Fotos'} endgültig löschen? Das lässt sich nicht rückgängig machen.`)) return;
+				deleteSelected.disabled = true;
+				selectedCount.textContent = `Lösche ${targets.length} …`;
+				await deleteCards(targets);
 			});
 
 			// Upload
