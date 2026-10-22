@@ -5,7 +5,12 @@ import { getManifest } from '../lib/manifest';
 import { galleryPhotos, subjectOf, subjects, tags, tagsOf } from '../lib/photos';
 
 const manifest = await getManifest();
+// New order on every visit, so the gallery doesn't always open with the same photos.
 const photos = galleryPhotos(manifest);
+for (let i = photos.length - 1; i > 0; i--) {
+	const j = Math.floor(Math.random() * (i + 1));
+	[photos[i], photos[j]] = [photos[j], photos[i]];
+}
 const titles = Object.fromEntries([...subjects, ...tags].map((t) => [t.slug, t.title]));
 
 // The active filter comes from the URL, so filtered views can be linked and work without JavaScript.
@@ -58,16 +63,16 @@ const altOf = (photo: (typeof photos)[number]) =>
 			))}
 		</nav>
 
+		<script is:inline>document.documentElement.classList.add('gallery-fade');</script>
 		<section class="series-gallery" aria-label="Galerie" data-gallery>
 			{photos.map((photo, index) => (
 				<button
-					class="series-gallery-trigger fade-item"
+					class="series-gallery-trigger"
 					type="button"
 					data-lightbox-trigger={index}
 					data-motiv={subjectOf(photo) ?? ''}
 					data-tags={tagsOf(photo).join(' ')}
 					hidden={!matches(photo)}
-					style={`--i:${Math.min(index + 2, 12)};`}
 					aria-label={`${altOf(photo)}, Bild öffnen`}
 				>
 					<R2Picture
@@ -155,6 +160,29 @@ const altOf = (photo: (typeof photos)[number]) =>
 
 	<script is:inline>
 		const triggers = Array.from(document.querySelectorAll('[data-lightbox-trigger]'));
+
+		// Fade each photo in once it has loaded, cached or not. Photos that finish in the same frame fade in one after another.
+		let batch = [];
+		const reveal = (trigger) => {
+			if (!batch.length) {
+				requestAnimationFrame(() => {
+					batch.forEach((t, i) => {
+						t.style.transitionDelay = `${Math.min(i, 8) * 80}ms`;
+						t.classList.add('is-loaded');
+					});
+					batch = [];
+				});
+			}
+			batch.push(trigger);
+		};
+		triggers.forEach((trigger) => {
+			const img = trigger.querySelector('img');
+			if (!img || (img.complete && img.naturalWidth)) reveal(trigger);
+			else {
+				img.addEventListener('load', () => reveal(trigger), { once: true });
+				img.addEventListener('error', () => reveal(trigger), { once: true });
+			}
+		});
 		const visible = () => triggers.filter((t) => !t.hidden).map((t) => Number(t.dataset.lightboxTrigger));
 
 		// Filters: switch without reloading, keep the URL in sync.
