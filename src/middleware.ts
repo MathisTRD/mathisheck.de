@@ -1,5 +1,5 @@
 import { defineMiddleware } from 'astro:middleware';
-import { CF_ACCESS_TEAM_DOMAIN, CF_ACCESS_AUD, ADMIN_EMAILS, R2_PUBLIC_URL } from 'astro:env/server';
+import { CF_ACCESS_TEAM_DOMAIN, CF_ACCESS_AUD, ADMIN_EMAILS, R2_PUBLIC_URL, UMAMI_SCRIPT_URL } from 'astro:env/server';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 // /admin and /api/admin sit behind Cloudflare Access. Cloudflare only lets a request
@@ -40,13 +40,16 @@ async function verifyAccess(request: Request): Promise<string | null> {
 	}
 }
 
-const imageOrigin = (() => {
+const originOf = (url: string | undefined) => {
 	try {
-		return R2_PUBLIC_URL ? new URL(R2_PUBLIC_URL).origin : '';
+		return url ? new URL(url).origin : '';
 	} catch {
 		return '';
 	}
-})();
+};
+const imageOrigin = originOf(R2_PUBLIC_URL);
+// The Umami tracker loads from and reports to its own host (BaseLayout only adds it when configured).
+const analyticsOrigin = originOf(UMAMI_SCRIPT_URL);
 
 const SECURITY_HEADERS: Record<string, string> = {
 	'Content-Security-Policy': [
@@ -54,8 +57,8 @@ const SECURITY_HEADERS: Record<string, string> = {
 		`img-src 'self' data: ${imageOrigin}`.trim(),
 		"style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com",
 		"font-src 'self' https://cdn.fontshare.com https://api.fontshare.com https://fonts.gstatic.com",
-		"script-src 'self' 'unsafe-inline'",
-		"connect-src 'self'",
+		`script-src 'self' 'unsafe-inline' ${analyticsOrigin}`.trim(),
+		`connect-src 'self' ${analyticsOrigin}`.trim(),
 		"object-src 'none'",
 		"base-uri 'self'",
 		"form-action 'self'",

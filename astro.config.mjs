@@ -25,6 +25,8 @@ export default defineConfig({
       CF_ACCESS_TEAM_DOMAIN: secret(),
       CF_ACCESS_AUD: secret(),
       ADMIN_EMAILS: secret(),
+      UMAMI_SCRIPT_URL: secret(),
+      UMAMI_WEBSITE_ID: secret(),
     },
   },
   vite: {

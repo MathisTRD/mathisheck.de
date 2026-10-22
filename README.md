@@ -19,3 +19,9 @@ and rendered on the server with the Node adapter.
 
 The `DOCKERFILE` builds a production image that runs as a non-root user on port 3000.
 Configuration comes from the environment variables listed in `.env.example`.
+
+## Analytics
+
+[Umami](https://umami.is) runs as its own Dokploy service (e.g. `stats.mathisheck.de`). Set
+`UMAMI_SCRIPT_URL` and `UMAMI_WEBSITE_ID` to load the tracker on all public pages; the CSP then
+allows that host. `/admin` does not use the shared layout and is never tracked.
