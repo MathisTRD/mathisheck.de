@@ -632,6 +632,26 @@ body {
 
 	.hero-image {
 		max-width: 36rem;
+		width: 100%;
+		justify-self: center;
+	}
+
+	/* Stacked layouts: center every text block on the column */
+	.page-intro,
+	.series-meta,
+	.contact-links,
+	.info-block {
+		justify-items: center;
+		text-align: center;
+	}
+
+	.lead,
+	.series-meta p {
+		margin-inline: auto;
+	}
+
+	.button--back {
+		justify-self: center;
 	}
 }
 
