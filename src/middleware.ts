@@ -55,8 +55,8 @@ const SECURITY_HEADERS: Record<string, string> = {
 	'Content-Security-Policy': [
 		"default-src 'self'",
 		`img-src 'self' data: ${imageOrigin}`.trim(),
-		"style-src 'self' 'unsafe-inline' https://api.fontshare.com https://fonts.googleapis.com",
-		"font-src 'self' https://cdn.fontshare.com https://api.fontshare.com https://fonts.gstatic.com",
+		"style-src 'self' 'unsafe-inline'",
+		"font-src 'self' data:",
 		`script-src 'self' 'unsafe-inline' ${analyticsOrigin}`.trim(),
 		`connect-src 'self' ${analyticsOrigin}`.trim(),
 		"object-src 'none'",

@@ -1,4 +1,3 @@
-@import url("https://api.fontshare.com/v2/css?f[]=plus-jakarta-sans@400,500&display=swap");
 @import "tailwindcss";
 
 /* Design tokens: every font size, weight and spacing on the site comes from here. */
