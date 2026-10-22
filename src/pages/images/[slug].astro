@@ -2,20 +2,16 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import series from '../../data/series.json';
 import R2Picture from '../../components/R2Picture.astro';
+import { getManifest } from '../../lib/manifest';
 import { photosInFolder } from '../../lib/photos';
 
-type SeriesItem = (typeof series)[number];
+export const prerender = false;
 
-export function getStaticPaths() {
-	return series.map((item) => ({
-		params: { slug: item.slug },
-		props: { item },
-	}));
-}
+const item = series.find((s) => s.slug === Astro.params.slug);
+if (!item) return new Response(null, { status: 404 });
 
-const { item } = Astro.props as { item: SeriesItem };
-
-const images = photosInFolder(item.folder);
+const manifest = await getManifest();
+const images = photosInFolder(manifest, item.folder);
 ---
 
 <BaseLayout title={`${item.title} | Mathis Heck`} description={item.description}>
@@ -36,6 +32,7 @@ const images = photosInFolder(item.folder);
 				>
 					<R2Picture
 						photo={image}
+						baseUrl={manifest.baseUrl}
 						alt={`${item.title} image ${index + 1}`}
 						maxWidth={1280}
 						sizes="(min-width: 900px) 33vw, 100vw"
@@ -58,6 +55,7 @@ const images = photosInFolder(item.folder);
 							<figure class="lightbox-item" data-lightbox-item={index} hidden={index !== 0}>
 								<R2Picture
 									photo={image}
+									baseUrl={manifest.baseUrl}
 									alt={`${item.title} image ${index + 1}`}
 									sizes="100vw"
 									loading="eager"

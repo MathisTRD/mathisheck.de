@@ -2,13 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import R2Picture from '../components/R2Picture.astro';
 import series from '../data/series.json';
-import { getPhoto } from '../lib/photos';
+import { getManifest } from '../lib/manifest';
+import { getCover } from '../lib/photos';
 
-const getCover = (cover: string) => {
-	const photo = getPhoto('cover', cover);
-	if (!photo) throw new Error(`Cover "${cover}" not found in src/data/photos.json`);
-	return photo;
-};
+export const prerender = false;
+
+const manifest = await getManifest();
+const covers = series.map((s) => getCover(manifest, s));
 
 ---
 
@@ -24,8 +24,10 @@ const getCover = (cover: string) => {
 				<article class={`work-item ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug}>
 					<div class="img-wrap">
 						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Open ${s.title} series`}>
+{covers[i] && (
 							<R2Picture
-								photo={getCover(s.cover)}
+								photo={covers[i]}
+								baseUrl={manifest.baseUrl}
 								class={`series-cover ${s.slug === 'astro' ? 'series-cover--astro' : ''}`}
 								alt={`${s.title} cover`}
 								sizes="(min-width: 900px) 50vw, 100vw"
@@ -33,6 +35,7 @@ const getCover = (cover: string) => {
 								decoding="auto"
 								fetchpriority={i === 0 ? 'high' : 'low'}
 							/>
+							)}
 						</a>
 					</div>
 					<div class="series-meta">
