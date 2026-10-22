@@ -1,125 +1,48 @@
-// Converts every photo in ./photos/<folder>/ to AVIF + WebP in several widths,
-// uploads them to Cloudflare R2 and writes src/data/photos.json for the site.
+// Bulk upload: converts every photo in ./photos/<folder>/ that is not in the
+// manifest yet, uploads it to Cloudflare R2 and updates manifest.json in R2
+// plus the fallback copy in src/data/photos.json.
+// For single photos, the /admin page does the same thing in the browser.
 //
 // Usage:
-//   node --env-file=.env scripts/upload-photos.mjs            upload new photos
-//   node --env-file=.env scripts/upload-photos.mjs --force    re-upload everything
-//   node --env-file=.env scripts/upload-photos.mjs --dry-run  only write the manifest
+//   npm run photos:upload              upload new photos
+//   npm run photos:upload -- --force   re-upload everything
 
-import { readdir, writeFile } from 'node:fs/promises';
+import { readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import sharp from 'sharp';
-import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
+import { createStore, slugify, upsertPhoto } from '../src/lib/photo-store.mjs';
 
 const SOURCE_DIR = process.env.PHOTOS_DIR ?? 'photos';
-const MANIFEST = 'src/data/photos.json';
-const WIDTHS = [360, 640, 960, 1280, 1600, 2000];
-const FORMATS = {
-	avif: (img) => img.avif({ quality: 55, effort: 4 }),
-	webp: (img) => img.webp({ quality: 78 }),
-};
+const LOCAL_MANIFEST = 'src/data/photos.json';
 const INPUT_EXT = /\.(jpe?g|png|webp|avif|tiff?)$/i;
 
-const args = new Set(process.argv.slice(2));
-const dryRun = args.has('--dry-run');
-const force = args.has('--force');
+const force = process.argv.includes('--force');
+const store = createStore(process.env);
 
-const env = (name) => {
-	const value = process.env[name];
-	if (!value && !dryRun) throw new Error(`Missing env var ${name} (see .env.example)`);
-	return value;
-};
-
-const bucket = env('R2_BUCKET');
-const accountId = env('R2_ACCOUNT_ID')?.trim();
-if (accountId && !/^[0-9a-f]{32}$/i.test(accountId)) {
-	throw new Error('R2_ACCOUNT_ID must be the 32-character account ID only, not a URL');
-}
-const baseUrl = (env('R2_PUBLIC_URL') ?? 'https://images.mathisheck.de').replace(/\/+$/, '');
-const s3 = dryRun
-	? null
-	: new S3Client({
-			region: 'auto',
-			forcePathStyle: true,
-			endpoint: `https://${accountId}.${process.env.R2_JURISDICTION ? process.env.R2_JURISDICTION + '.' : ''}r2.cloudflarestorage.com`,
-			credentials: {
-				accessKeyId: env('R2_ACCESS_KEY_ID'),
-				secretAccessKey: env('R2_SECRET_ACCESS_KEY'),
-			},
-		});
-
-const slugify = (name) =>
-	name
-		.toLowerCase()
-		.replace(/\.[^.]+$/, '')
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-|-$/g, '');
-
-const exists = async (key) => {
-	try {
-		await s3.send(new HeadObjectCommand({ Bucket: bucket, Key: key }));
-		return true;
-	} catch (error) {
-		if (error.$metadata?.httpStatusCode === 404) return false;
-		throw error;
-	}
-};
-
-const upload = (key, body, contentType) =>
-	s3.send(
-		new PutObjectCommand({
-			Bucket: bucket,
-			Key: key,
-			Body: body,
-			ContentType: contentType,
-			CacheControl: 'public, max-age=31536000, immutable',
-		})
-	);
+let manifest =
+	(await store.getManifest()) ??
+	(await readFile(LOCAL_MANIFEST, 'utf8').then(JSON.parse, () => null)) ?? { photos: [] };
 
 const folders = (await readdir(SOURCE_DIR, { withFileTypes: true }))
 	.filter((entry) => entry.isDirectory())
 	.map((entry) => entry.name)
 	.sort();
 
-const photos = [];
-
 for (const folder of folders) {
 	const files = (await readdir(path.join(SOURCE_DIR, folder))).filter((f) => INPUT_EXT.test(f)).sort();
 
 	for (const file of files) {
 		const name = slugify(file);
-		const source = sharp(path.join(SOURCE_DIR, folder, file)).rotate();
-		const meta = await source.metadata();
-		const rotated = (meta.orientation ?? 1) >= 5;
-		const width = rotated ? meta.height : meta.width;
-		const height = rotated ? meta.width : meta.height;
-		const largest = Math.min(width, WIDTHS.at(-1));
-		const widths = [...WIDTHS.filter((w) => w < largest), largest];
-
-		const prefix = `${folder}/${name}`;
-		photos.push({ folder, name, width, height, widths });
-
-		if (dryRun) {
-			console.log(`[dry-run] ${prefix} (${width}x${height}) -> ${widths.join(', ')}`);
+		if (!force && manifest.photos.some((p) => p.folder === folder && p.name === name)) {
+			console.log(`skip    ${folder}/${name}`);
 			continue;
 		}
-
-		const lastKey = `${prefix}/${widths.at(-1)}.webp`;
-		if (!force && (await exists(lastKey))) {
-			console.log(`skip    ${prefix}`);
-			continue;
-		}
-
-		for (const w of widths) {
-			const resized = source.clone().resize({ width: w, withoutEnlargement: true });
-			for (const [ext, encode] of Object.entries(FORMATS)) {
-				const body = await encode(resized.clone()).toBuffer();
-				await upload(`${prefix}/${w}.${ext}`, body, `image/${ext}`);
-			}
-		}
-		console.log(`upload  ${prefix} (${widths.length} sizes)`);
+		const entry = await store.addPhoto(folder, file, await readFile(path.join(SOURCE_DIR, folder, file)));
+		manifest = upsertPhoto(manifest, entry);
+		await store.saveManifest(manifest);
+		console.log(`upload  ${folder}/${name} (${entry.widths.length} sizes)`);
 	}
 }
 
-await writeFile(MANIFEST, JSON.stringify({ baseUrl, photos }, null, '\t') + '\n');
-console.log(`\nWrote ${photos.length} photos to ${MANIFEST}`);
+await store.saveManifest(manifest);
+await writeFile(LOCAL_MANIFEST, JSON.stringify({ ...manifest, baseUrl: store.baseUrl }, null, '\t') + '\n');
+console.log(`\n${manifest.photos.length} photos in manifest`);

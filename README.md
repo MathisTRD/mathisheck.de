@@ -10,18 +10,26 @@ npm run build   # ./dist
 
 ## Photos (Cloudflare R2)
 
-Photos are not stored in this repo. They live in a Cloudflare R2 bucket as AVIF + WebP
-in widths 360, 640, 960, 1280, 1600 and 2000 px. `src/data/photos.json` lists them and is
-what the site builds from.
+Photos live in a Cloudflare R2 bucket, not in this repo: AVIF + WebP in widths
+360–2000 px under `<folder>/<name>/`, the originals under `originals/`, and the list of
+all photos in `manifest.json`. The gallery pages read that manifest at request time, so
+new photos show up without a redeploy.
 
-Add or change photos:
+### Upload page
 
-1. Put the originals in `photos/<folder>/` (gitignored). `<folder>` is the `folder` from
-   `src/data/series.json`; covers go in `photos/cover/` and are referenced by `cover`.
-2. Copy `.env.example` to `.env` and fill in the R2 values.
-3. `npm run photos:upload` converts and uploads new photos and rewrites `src/data/photos.json`.
-   `--force` re-uploads everything, `--dry-run` only rewrites the manifest.
-4. Commit `src/data/photos.json` and push. Dokploy redeploys.
+`https://mathisheck.de/admin` (password: `ADMIN_PASSWORD`, any user name). Pick a series,
+drop photos in, done. Each photo can also be deleted or set as the series cover.
 
-Removing a photo: delete it from `photos/`, run the script, commit. The files stay in R2
-until you delete them there.
+### Server setup (Dokploy)
+
+Set these in the app's Environment: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`,
+`R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL`, `ADMIN_PASSWORD`
+(and `R2_JURISDICTION=eu` for an EU bucket). See `.env.example`.
+The container runs a Node server on port 80.
+
+### Bulk upload from the PC
+
+Put originals in `photos/<folder>/` (gitignored), fill in `.env`, run
+`npm run photos:upload`. Photos already in the manifest are skipped; `--force` re-uploads.
+
+`src/data/photos.json` is only a fallback for when R2 is unreachable or not configured.

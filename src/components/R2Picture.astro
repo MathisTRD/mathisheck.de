@@ -3,6 +3,7 @@ import { photoUrl, srcset, type Photo } from '../lib/photos';
 
 interface Props {
 	photo: Photo;
+	baseUrl: string;
 	alt: string;
 	sizes: string;
 	maxWidth?: number;
@@ -12,18 +13,18 @@ interface Props {
 	fetchpriority?: 'high' | 'low' | 'auto';
 }
 
-const { photo, alt, sizes, maxWidth = Infinity, class: className, loading = 'lazy', decoding = 'async', fetchpriority } = Astro.props;
+const { photo, baseUrl, alt, sizes, maxWidth = Infinity, class: className, loading = 'lazy', decoding = 'async', fetchpriority } = Astro.props;
 
 const fallbackWidth = photo.widths.filter((w) => w <= Math.min(maxWidth, 1280)).at(-1) ?? photo.widths[0];
 const height = Math.round((photo.height / photo.width) * fallbackWidth);
 ---
 
 <picture>
-	<source type="image/avif" srcset={srcset(photo, 'avif', maxWidth)} sizes={sizes} />
-	<source type="image/webp" srcset={srcset(photo, 'webp', maxWidth)} sizes={sizes} />
+	<source type="image/avif" srcset={srcset(baseUrl, photo, 'avif', maxWidth)} sizes={sizes} />
+	<source type="image/webp" srcset={srcset(baseUrl, photo, 'webp', maxWidth)} sizes={sizes} />
 	<img
 		class={className}
-		src={photoUrl(photo, fallbackWidth, 'webp')}
+		src={photoUrl(baseUrl, photo, fallbackWidth, 'webp')}
 		alt={alt}
 		width={fallbackWidth}
 		height={height}
