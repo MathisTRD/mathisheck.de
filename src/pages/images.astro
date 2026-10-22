@@ -10,24 +10,24 @@ const covers = series.map((s) => getCover(manifest, s));
 
 ---
 
-<BaseLayout title="Images | Mathis Heck" description="Selected photography series by Mathis Heck">
-	<section class="images-page" aria-label="Selected work">
+<BaseLayout title="Bilder | Mathis Heck" description="Ausgewählte Fotoserien von Mathis Heck">
+	<section class="images-page" aria-label="Ausgewählte Arbeiten">
 		<header class="page-intro">
-			<p class="eyebrow">Images</p>
-			<h1 class="page-title">Selected series.</h1>
+			<p class="eyebrow">Bilder</p>
+			<h1 class="page-title">Ausgewählte Serien.</h1>
 		</header>
 
-		<section class="work" aria-label="Series overview">
+		<section class="work" aria-label="Serienübersicht">
 			{series.map((s, i) => (
 				<article class={`work-item ${i % 2 === 1 ? 'work-item--reverse' : ''}`} data-slug={s.slug}>
 					<div class="img-wrap">
-						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Open ${s.title} series`}>
+						<a class="series-cover-link" href={`/images/${s.slug}`} aria-label={`Serie ${s.title} öffnen`}>
 {covers[i] && (
 							<R2Picture
 								photo={covers[i]}
 								baseUrl={manifest.baseUrl}
 								class={`series-cover ${s.slug === 'astro' ? 'series-cover--astro' : ''}`}
-								alt={`${s.title} cover`}
+								alt={`Titelbild der Serie ${s.title}`}
 								sizes="(min-width: 900px) 50vw, 100vw"
 								loading={i === 0 ? 'eager' : 'lazy'}
 								decoding="auto"
@@ -39,7 +39,7 @@ const covers = series.map((s) => getCover(manifest, s));
 					<div class="series-meta">
 						<h2>{s.title}</h2>
 						<p>{s.description}</p>
-						<a href={`/images/${s.slug}`} class="button">View series →</a>
+						<a href={`/images/${s.slug}`} class="button">Serie ansehen →</a>
 					</div>
 				</article>
 			))}

@@ -15,23 +15,23 @@ const images = photosInFolder(manifest, item.folder);
 <BaseLayout title={`${item.title} | Mathis Heck`} description={item.description}>
 	<section class="series-page" aria-label={item.title}>
 		<header class="page-intro fade-item" style="--i:0">
-			<p class="eyebrow">Images</p>
+			<p class="eyebrow">Bilder</p>
 			<h1 class="page-title">{item.title}</h1>
 		</header>
 
-		<section class="series-gallery series-gallery--local" aria-label={`${item.title} gallery`}>
+		<section class="series-gallery series-gallery--local" aria-label={`Galerie ${item.title}`}>
 			{images.map((image, index) => (
 				<button
 					class="series-gallery-trigger fade-item"
 					type="button"
 					data-lightbox-trigger={index}
 					style={`--i:${index + 1};`}
-					aria-label={`Open ${item.title} image ${index + 1}`}
+					aria-label={`${item.title}, Bild ${index + 1} öffnen`}
 				>
 					<R2Picture
 						photo={image}
 						baseUrl={manifest.baseUrl}
-						alt={`${item.title} image ${index + 1}`}
+						alt={`${item.title}, Bild ${index + 1}`}
 						maxWidth={1280}
 						sizes="(min-width: 900px) 33vw, 100vw"
 						loading={index === 0 ? 'eager' : 'lazy'}
@@ -41,27 +41,27 @@ const images = photosInFolder(manifest, item.folder);
 		</section>
 
 
-		<a class="button button--back fade-item" style={`--i:${Math.max(3, images.length + 2)}`} href="/images">Back to images</a>
+		<a class="button button--back fade-item" style={`--i:${Math.max(3, images.length + 2)}`} href="/images">Zurück zu den Bildern</a>
 
 		{images.length > 0 ? (
 			<div class="lightbox" data-lightbox hidden aria-hidden="true">
-				<button class="lightbox-backdrop" type="button" data-lightbox-close aria-label="Close lightbox"></button>
+				<button class="lightbox-backdrop" type="button" data-lightbox-close aria-label="Vergrößerung schließen"></button>
 				<div class="lightbox-shell" role="presentation">
-					<button class="lightbox-zone lightbox-zone--prev" type="button" data-lightbox-prev aria-label="Previous image"></button>
-					<div class="lightbox-stage" aria-label={`${item.title} enlarged image`}>
+					<button class="lightbox-zone lightbox-zone--prev" type="button" data-lightbox-prev aria-label="Vorheriges Bild"></button>
+					<div class="lightbox-stage" aria-label={`${item.title}, vergrößertes Bild`}>
 						{images.map((image, index) => (
 							<figure class="lightbox-item" data-lightbox-item={index} hidden={index !== 0}>
 								<R2Picture
 									photo={image}
 									baseUrl={manifest.baseUrl}
-									alt={`${item.title} image ${index + 1}`}
+									alt={`${item.title}, Bild ${index + 1}`}
 									sizes="100vw"
 									loading="eager"
 								/>
 							</figure>
 						))}
 					</div>
-					<button class="lightbox-zone lightbox-zone--next" type="button" data-lightbox-next aria-label="Next image"></button>
+					<button class="lightbox-zone lightbox-zone--next" type="button" data-lightbox-next aria-label="Nächstes Bild"></button>
 				</div>
 			</div>
 		) : null}

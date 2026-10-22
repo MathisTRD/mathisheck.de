@@ -154,6 +154,17 @@ body {
 .nav-toggle .hamburger::before { top: -7px; }
 .nav-toggle .hamburger::after { top: 7px; }
 
+.nav-toggle .hamburger,
+.nav-toggle .hamburger::before,
+.nav-toggle .hamburger::after {
+	transition: transform 180ms ease, background 180ms ease;
+}
+
+/* Hamburger turns into a cross while the menu is open */
+.nav-toggle[aria-expanded="true"] .hamburger { background: transparent; }
+.nav-toggle[aria-expanded="true"] .hamburger::before { transform: translateY(7px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .hamburger::after { transform: translateY(-7px) rotate(-45deg); }
+
 /* ---------- Page frame ---------- */
 
 .portfolio {
@@ -607,8 +618,12 @@ body {
 		gap: var(--space-6);
 	}
 
+	.work {
+		gap: var(--space-8);
+	}
+
 	.work-item {
-		gap: var(--space-5);
+		gap: var(--space-4);
 	}
 
 	.work-item--reverse .img-wrap {
@@ -626,21 +641,21 @@ body {
 		z-index: 10002;
 	}
 
-	/* Collapsed nav opens as a dropdown below the header */
+	/* Collapsed nav opens as a full-width panel below the header */
 	.site-nav {
 		display: none;
 		position: absolute;
-		left: var(--gutter);
-		right: var(--gutter);
-		top: calc(100% + var(--space-2));
+		left: 0;
+		right: 0;
+		top: 100%;
 		z-index: 10001;
 		flex-direction: column;
 		align-items: stretch;
 		gap: 0;
 		padding: var(--space-2) 0;
 		background: #fbfbf8;
-		border-radius: var(--radius);
-		box-shadow: 0 12px 36px rgba(12, 12, 12, 0.08);
+		border-bottom: 1px solid var(--color-line);
+		box-shadow: 0 16px 32px rgba(12, 12, 12, 0.06);
 	}
 
 	.site-nav.open {
@@ -649,7 +664,8 @@ body {
 
 	.site-nav a {
 		display: block;
-		padding: var(--space-3) var(--space-4);
+		padding: var(--space-4) var(--inline-pad);
+		font-size: var(--text-sm);
 	}
 }
 
@@ -663,7 +679,13 @@ body {
 	}
 
 	.hero-image {
+		aspect-ratio: 4 / 5;
+		max-width: none;
 		--hero-focal: 50% 30%;
+	}
+
+	.lead {
+		font-size: var(--text-base);
 	}
 
 	.series-gallery {
