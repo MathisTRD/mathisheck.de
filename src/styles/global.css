@@ -657,9 +657,19 @@ body {
 		font-size: var(--text-base);
 	}
 
+	/* Two columns keep portrait photos from filling the whole screen; tap opens them large */
 	.series-gallery {
 		column-width: auto;
-		column-count: 1;
+		column-count: 2;
+		column-gap: var(--space-2);
+	}
+
+	.series-gallery-trigger {
+		margin-bottom: var(--space-2);
+	}
+
+	.filter-divider {
+		display: none;
 	}
 
 	.lightbox-shell {
