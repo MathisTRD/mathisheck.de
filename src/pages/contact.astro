@@ -3,27 +3,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Contact | Mathis Heck" description="Contact Mathis Heck">
-	<style>
-		/* Keep the contact page as a fixed viewport layout */
-		html, body { overflow: hidden; height: 100%; }
-		.portfolio {
-			min-height: 90vh;
-			padding-top: 1.75rem;
-			padding-bottom: 0.75rem;
-			gap: 1.4rem;
-		}
-		.hero-split {
-			padding-top: 1.8rem;
-			padding-bottom: 0.9rem;
-		}
-		.contact-hero {
-			gap: clamp(1.5rem, 4vw, 3rem);
-		}
-	</style>
-	<section class="hero-split contact-hero" aria-label="Contact">
-		<div class="contact-copy">
+	<section class="hero-split" aria-label="Contact">
+		<div class="page-intro">
 			<p class="eyebrow fade-item" style="--i:0">Contact</p>
-			<h1 class="intro-title fade-item" style="--i:1">where to find me</h1>
+			<h1 class="page-title fade-item" style="--i:1">where to find me</h1>
 			<p class="lead fade-item" style="--i:2">
 				For commissions, collaborations, or print inquiries, reach out via email or Instagram.
 			</p>

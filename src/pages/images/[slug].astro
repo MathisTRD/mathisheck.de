@@ -14,9 +14,9 @@ const images = photosInFolder(manifest, item.folder);
 
 <BaseLayout title={`${item.title} | Mathis Heck`} description={item.description}>
 	<section class="series-page" aria-label={item.title}>
-		<header class="series-page-header fade-item" style="--i:0">
+		<header class="page-intro fade-item" style="--i:0">
 			<p class="eyebrow">Images</p>
-			<h1 class="series-placeholder-title">{item.title}</h1>
+			<h1 class="page-title">{item.title}</h1>
 		</header>
 
 		<section class="series-gallery series-gallery--local" aria-label={`${item.title} gallery`}>
@@ -41,7 +41,7 @@ const images = photosInFolder(manifest, item.folder);
 		</section>
 
 
-		<a class="series-link series-link--back fade-item" style={`--i:${Math.max(3, images.length + 2)}`} href="/images">Back to images</a>
+		<a class="button button--back fade-item" style={`--i:${Math.max(3, images.length + 2)}`} href="/images">Back to images</a>
 
 		{images.length > 0 ? (
 			<div class="lightbox" data-lightbox hidden aria-hidden="true">

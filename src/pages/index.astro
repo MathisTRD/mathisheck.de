@@ -3,31 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Mathis Heck | Photographer" description="Portfolio homepage for Mathis Heck">
-	<style>
-		/* Keep the homepage as a fixed viewport hero */
-		html, body { overflow: hidden; height: 100%; }
-		.portfolio {
-			min-height: 90vh;
-			padding-top: 2rem;
-			padding-bottom: 0.75rem;
-			gap: 1.6rem;
-		}
-		.hero-split {
-			padding-top: 2rem;
-			padding-bottom: 1rem;
-		}
-	</style>
 	<section class="hero-split" aria-label="Introduction">
 		<div class="hero-image">
 			<img class="fade-item" style="--i:0" src="/bio.png" alt="Mathis Heck — portrait" />
 		</div>
-		<div class="hero-copy">
+		<div class="page-intro">
 			<p class="eyebrow fade-item" style="--i:1">Photographer</p>
-			<h1 class="intro-title fade-item" style="--i:2">Mathis Heck</h1>
+			<h1 class="page-title fade-item" style="--i:2">Mathis Heck</h1>
 			<p class="lead fade-item" style="--i:3">
 				Street, Astro, Concerts, Black & White and everything I find interesting to shoot.
 			</p>
-			<a class="btn-outline fade-item" style="--i:4" href="/images">Portfolio</a>
+			<a class="button fade-item" style="--i:4" href="/images">Portfolio</a>
 		</div>
 	</section>
 </BaseLayout>
