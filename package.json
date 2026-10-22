@@ -14,10 +14,10 @@
     "start": "node --env-file-if-exists=.env dist/server/entry.mjs"
   },
   "dependencies": {
-    "@astrojs/node": "^10.1.4",
+    "@astrojs/node": "^11.1.9",
     "@aws-sdk/client-s3": "^3.1155.0",
     "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.4.4",
+    "astro": "^7.4.2",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.0"
   }
