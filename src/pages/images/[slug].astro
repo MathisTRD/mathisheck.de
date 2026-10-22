@@ -1,22 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import series from '../../data/series.json';
-import { Image } from 'astro:assets';
+import R2Picture from '../../components/R2Picture.astro';
+import { photosInFolder } from '../../lib/photos';
 
 type SeriesItem = (typeof series)[number];
-
-type LocalImage = {
-	src: ImageMetadata;
-	name: string;
-	folder: string;
-};
-
-type ImageMetadata = import('astro').ImageMetadata;
-
-const assetModules = import.meta.glob<ImageMetadata>('../../assets/**/*.{jpg,jpeg,png,webp,avif}', {
-	import: 'default',
-	eager: false,
-});
 
 export function getStaticPaths() {
 	return series.map((item) => ({
@@ -27,22 +15,7 @@ export function getStaticPaths() {
 
 const { item } = Astro.props as { item: SeriesItem };
 
-const localImages = await Promise.all(
-	Object.entries(assetModules)
-		.filter(([path]) => path.includes(`/${item.folder}/`))
-		.map(async ([path, resolver]) => {
-			const module = await resolver();
-			return {
-				src: module,
-				name: path.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'image',
-				folder: path.split('/').at(-2) ?? '',
-			};
-		})
-);
-
-localImages.sort((left, right) => left.name.localeCompare(right.name));
-
-const images = localImages.filter((image) => image.folder === item.folder);
+const images = photosInFolder(item.folder);
 ---
 
 <BaseLayout title={`${item.title} | Mathis Heck`} description={item.description}>
@@ -61,10 +34,10 @@ const images = localImages.filter((image) => image.folder === item.folder);
 					style={`--i:${index + 1};`}
 					aria-label={`Open ${item.title} image ${index + 1}`}
 				>
-					<Image
-						src={image.src}
+					<R2Picture
+						photo={image}
 						alt={`${item.title} image ${index + 1}`}
-						widths={[360, 640, 960, 1280]}
+						maxWidth={1280}
 						sizes="(min-width: 900px) 33vw, 100vw"
 						loading={index === 0 ? 'eager' : 'lazy'}
 					/>
@@ -83,10 +56,9 @@ const images = localImages.filter((image) => image.folder === item.folder);
 					<div class="lightbox-stage" aria-label={`${item.title} enlarged image`}>
 						{images.map((image, index) => (
 							<figure class="lightbox-item" data-lightbox-item={index} hidden={index !== 0}>
-								<Image
-									src={image.src}
+								<R2Picture
+									photo={image}
 									alt={`${item.title} image ${index + 1}`}
-									widths={[640, 960, 1280, 1600, 2000]}
 									sizes="100vw"
 									loading="eager"
 								/>

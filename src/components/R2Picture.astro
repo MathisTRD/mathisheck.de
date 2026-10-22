@@ -1,0 +1,34 @@
+---
+import { photoUrl, srcset, type Photo } from '../lib/photos';
+
+interface Props {
+	photo: Photo;
+	alt: string;
+	sizes: string;
+	maxWidth?: number;
+	class?: string;
+	loading?: 'eager' | 'lazy';
+	decoding?: 'async' | 'auto' | 'sync';
+	fetchpriority?: 'high' | 'low' | 'auto';
+}
+
+const { photo, alt, sizes, maxWidth = Infinity, class: className, loading = 'lazy', decoding = 'async', fetchpriority } = Astro.props;
+
+const fallbackWidth = photo.widths.filter((w) => w <= Math.min(maxWidth, 1280)).at(-1) ?? photo.widths[0];
+const height = Math.round((photo.height / photo.width) * fallbackWidth);
+---
+
+<picture>
+	<source type="image/avif" srcset={srcset(photo, 'avif', maxWidth)} sizes={sizes} />
+	<source type="image/webp" srcset={srcset(photo, 'webp', maxWidth)} sizes={sizes} />
+	<img
+		class={className}
+		src={photoUrl(photo, fallbackWidth, 'webp')}
+		alt={alt}
+		width={fallbackWidth}
+		height={height}
+		loading={loading}
+		decoding={decoding}
+		fetchpriority={fetchpriority}
+	/>
+</picture>

@@ -9,11 +9,16 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "photos:upload": "node --env-file=.env scripts/upload-photos.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.4.4",
     "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1155.0",
+    "sharp": "^0.35.5"
   }
 }

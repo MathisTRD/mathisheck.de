@@ -9,6 +9,10 @@
 	color: #111111;
 }
 
+picture {
+	display: contents;
+}
+
 html,
 body {
 	margin: 0;

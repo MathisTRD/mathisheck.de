@@ -1,0 +1,788 @@
+{
+	"baseUrl": "https://images.mathisheck.de",
+	"photos": [
+		{
+			"folder": "astro",
+			"name": "mathisheck-0174-gzsmax",
+			"width": 3230,
+			"height": 5769,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "astro",
+			"name": "mathisheck-0830-eyr2sz",
+			"width": 2880,
+			"height": 4032,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "astro",
+			"name": "mathisheck-0937-cl7cxs",
+			"width": 3778,
+			"height": 2736,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "astro",
+			"name": "mathisheck-1312-x1o0oh",
+			"width": 641,
+			"height": 1179,
+			"widths": [
+				360,
+				640,
+				641
+			]
+		},
+		{
+			"folder": "astro",
+			"name": "mathisheck-2184-fad88h",
+			"width": 437,
+			"height": 830,
+			"widths": [
+				360,
+				437
+			]
+		},
+		{
+			"folder": "astro",
+			"name": "mathisheck-3134-a2nbfg",
+			"width": 1024,
+			"height": 1536,
+			"widths": [
+				360,
+				640,
+				960,
+				1024
+			]
+		},
+		{
+			"folder": "astro",
+			"name": "mathisheck-3322-ofic3v",
+			"width": 2124,
+			"height": 1586,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "astro",
+			"name": "mathisheck-6638-hhtil7",
+			"width": 1024,
+			"height": 1536,
+			"widths": [
+				360,
+				640,
+				960,
+				1024
+			]
+		},
+		{
+			"folder": "blackandwhite",
+			"name": "mathisheck-13-eatiij",
+			"width": 2516,
+			"height": 1479,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "blackandwhite",
+			"name": "mathisheck-14-j5ccox",
+			"width": 3453,
+			"height": 2908,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "blackandwhite",
+			"name": "mathisheck-5-mjd39o",
+			"width": 7728,
+			"height": 4344,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "blackandwhite",
+			"name": "untitled-5906",
+			"width": 2832,
+			"height": 1889,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "blackandwhite",
+			"name": "untitled-5915",
+			"width": 2668,
+			"height": 3389,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "blackandwhite",
+			"name": "untitled-5975",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-114-vajpg8",
+			"width": 7517,
+			"height": 5011,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-18-wa88ix",
+			"width": 5817,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-3542-oonwvv",
+			"width": 6649,
+			"height": 3902,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-3601-y4eht8",
+			"width": 3903,
+			"height": 3954,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-3617-xfl9ng",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-3749-zraga7",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-37-iypt4b",
+			"width": 7728,
+			"height": 4344,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-4080-lva0nj",
+			"width": 3381,
+			"height": 2878,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "mathisheck-75-vfd2tf",
+			"width": 3741,
+			"height": 2494,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-1050621",
+			"width": 3068,
+			"height": 2304,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-4573-jyhlzt",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-4601-gofieo",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-4624-nayi7v",
+			"width": 5086,
+			"height": 2801,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-4667-giaqng",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-4668-flrqvb",
+			"width": 6123,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-4791-eronkx",
+			"width": 7728,
+			"height": 4347,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-4835-jkilkb",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-5309",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "color",
+			"name": "untitled-5687",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "concert",
+			"name": "mathisheck-21-gtnt2y",
+			"width": 3024,
+			"height": 4032,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "concert",
+			"name": "mathisheck-22-xcdhpo",
+			"width": 3024,
+			"height": 4032,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "concert",
+			"name": "mathisheck-28-r5zhgg",
+			"width": 3356,
+			"height": 5966,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "concert",
+			"name": "mathisheck-29-yomrd9",
+			"width": 4536,
+			"height": 8064,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "concert",
+			"name": "mathisheck-50-qlopgn",
+			"width": 1179,
+			"height": 632,
+			"widths": [
+				360,
+				640,
+				960,
+				1179
+			]
+		},
+		{
+			"folder": "cover",
+			"name": "astro",
+			"width": 1024,
+			"height": 1536,
+			"widths": [
+				360,
+				640,
+				960,
+				1024
+			]
+		},
+		{
+			"folder": "cover",
+			"name": "blackandwhite",
+			"width": 3453,
+			"height": 2908,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "cover",
+			"name": "color",
+			"width": 3741,
+			"height": 2494,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "cover",
+			"name": "concert",
+			"width": 3024,
+			"height": 4032,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "cover",
+			"name": "street",
+			"width": 3888,
+			"height": 2592,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-11-oqepsf",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-12-lrnfqd",
+			"width": 2824,
+			"height": 2220,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-3603-2-s5ibcw",
+			"width": 4061,
+			"height": 3160,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-4061-hpgo6a",
+			"width": 2848,
+			"height": 3010,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-4105-gazcuv",
+			"width": 5152,
+			"height": 7728,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-4414-dbrkmx",
+			"width": 5152,
+			"height": 7728,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-4423-t76fyp",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-52-h1oy2f",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-79-wq24e0",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-7-bb8rlk",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-83-fwmasz",
+			"width": 3888,
+			"height": 2592,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-86-hd3zqj",
+			"width": 3888,
+			"height": 2592,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-88-xicceb",
+			"width": 3888,
+			"height": 2592,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		},
+		{
+			"folder": "street",
+			"name": "mathisheck-9-db1kqe",
+			"width": 7728,
+			"height": 5152,
+			"widths": [
+				360,
+				640,
+				960,
+				1280,
+				1600,
+				2000
+			]
+		}
+	]
+}
